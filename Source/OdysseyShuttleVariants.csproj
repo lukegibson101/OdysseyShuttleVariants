@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Skeleton for the C# phases (crew/cargo split + engine tree). No behaviour yet; the mod
+       is pure-XML and fully functional without this assembly. Finalise package versions to
+       match the installed game (1.6) before the first real build. -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <AssemblyName>OdysseyShuttleVariants</AssemblyName>
+    <Nullable>disable</Nullable>
+    <Optimize>true</Optimize>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.*" />
+    <PackageReference Include="Lib.Harmony" Version="2.3.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Krafs.Publicizer" Version="2.2.1" />
+    <!-- MP compatibility layer (crew/cargo sync), added when the C# phase starts: -->
+    <!-- <PackageReference Include="RimWorld.MultiplayerAPI" Version="0.5.0" /> -->
+  </ItemGroup>
+
+  <!-- Use Krafs.Rimworld.Ref's reference assemblies instead of the .NET Framework dev pack. -->
+  <Target Name="RemoveFramework" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+    <PropertyGroup>
+      <TargetFrameworkDirectory></TargetFrameworkDirectory>
+    </PropertyGroup>
+  </Target>
+
+  <!-- Drop the built DLL into the mod's Assemblies/ folder. -->
+  <Target Name="CopyToMod" AfterTargets="Build">
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
+          DestinationFolder="$(ProjectDir)..\Assemblies\" />
+  </Target>
+
+</Project>
