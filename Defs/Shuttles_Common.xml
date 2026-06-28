@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Shared in-flight world object (a map blip). Per-shuttle building + skyfaller art lives
+       with each shuttle def. NOTE: expandingIconTexture still points at the vanilla world icon
+       (a tiny map marker) - clone it to Textures/World/... later if full separation is wanted. -->
+  <WorldObjectDef ParentName="ShuttleWorldObjectBase">
+    <defName>OSV_TravelingShuttle</defName>
+    <label>shuttle</label>
+    <description>A transport shuttle in flight.</description>
+    <expandingIconTexture>World/WorldObjects/Expanding/PassengerShuttle</expandingIconTexture>
+    <expandingIconDrawSize>1</expandingIconDrawSize>
+  </WorldObjectDef>
+
+</Defs>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Both hang off the vanilla Odyssey "Shuttles" research, mirroring how the base game
+       gates shuttle tech. The engine-tier tree (Advanced Propulsion -> branches) will be
+       added here in a later phase. -->
+
+  <ResearchProjectDef>
+    <defName>OSV_CargoShuttleTech</defName>
+    <label>cargo shuttle</label>
+    <description>Reinforced cargo frames and high-capacity transporter racks, enabling construction of the cargo shuttle.</description>
+    <baseCost>2500</baseCost>
+    <techLevel>Spacer</techLevel>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <requiredResearchFacilities>
+      <li>MultiAnalyzer</li>
+    </requiredResearchFacilities>
+    <prerequisites>
+      <li>Shuttles</li>
+    </prerequisites>
+    <researchViewX>16.0</researchViewX>
+    <researchViewY>0.6</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>OSV_TroopShuttleTech</defName>
+    <label>troop shuttle</label>
+    <description>Lightweight airframes and rapid-cycle launch systems, enabling construction of the troop shuttle.</description>
+    <baseCost>2500</baseCost>
+    <techLevel>Spacer</techLevel>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <requiredResearchFacilities>
+      <li>MultiAnalyzer</li>
+    </requiredResearchFacilities>
+    <prerequisites>
+      <li>Shuttles</li>
+    </prerequisites>
+    <researchViewX>16.0</researchViewX>
+    <researchViewY>1.6</researchViewY>
+  </ResearchProjectDef>
+
+</Defs>

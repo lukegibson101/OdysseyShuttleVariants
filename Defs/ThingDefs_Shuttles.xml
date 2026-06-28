@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- ============ shared base for our buildable shuttles ============ -->
+  <!-- Each concrete shuttle supplies its own graphicData (its own cloned art folder) and its
+       own skyfallers, so every craft is fully self-contained and can be re-skinned independently. -->
+  <ThingDef Name="OSV_ShuttleBase" ParentName="BuildingBase" Abstract="True">
+    <thingClass>Building_PassengerShuttle</thingClass>
+    <altitudeLayer>Building</altitudeLayer>
+    <preventDroppingThingsOn>true</preventDroppingThingsOn>
+    <pathCost>50</pathCost>
+    <blockWind>true</blockWind>
+    <passability>PassThroughOnly</passability>
+    <fillPercent>0.9</fillPercent>
+    <size>(3,5)</size>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>East</defaultPlacingRot>
+    <designationCategory>Odyssey</designationCategory>
+    <tickerType>Normal</tickerType>
+    <canOverlapZones>true</canOverlapZones>
+    <terrainAffordanceNeeded>Light</terrainAffordanceNeeded>
+    <drawerType>RealtimeOnly</drawerType>
+    <repairEffect>ConstructMetal</repairEffect>
+    <preventSkyfallersLandingOn>true</preventSkyfallersLandingOn>
+    <forceDebugSpawnable>true</forceDebugSpawnable>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(2, 0, 0)</interactionCellOffset>
+    <soundImpactDefault>BulletImpact_Metal</soundImpactDefault>
+    <statBases>
+      <MaxHitPoints>700</MaxHitPoints>
+      <Flammability>0.5</Flammability>
+      <Comfort>0.65</Comfort>
+    </statBases>
+    <building>
+      <claimable>false</claimable>
+      <destroySound>BuildingDestroyed_Metal_Big</destroySound>
+      <paintable>true</paintable>
+      <isInert>true</isInert>
+      <forcedCostLeavings>
+        <li MayRequire="Ludeon.RimWorld.Odyssey">ShuttleEngine</li>
+      </forcedCostLeavings>
+    </building>
+    <inspectorTabs>
+      <li>ITab_ContentsTransporter</li>
+    </inspectorTabs>
+    <comps>
+      <li Class="CompProperties_AmbientSound">
+        <sound>ShuttleIdle_Ambience</sound>
+      </li>
+    </comps>
+  </ThingDef>
+
+  <!-- abstract skyfaller bases that just carry the right thingClass; concrete ones set the art -->
+  <ThingDef Name="OSV_ShuttleIncomingBase" ParentName="ShuttleSkyfallerBase" Abstract="True">
+    <thingClass>PassengerShuttleIncoming</thingClass>
+    <skyfaller>
+      <anticipationSound>Shuttle_Landing</anticipationSound>
+      <anticipationSoundTicks>200</anticipationSoundTicks>
+      <ticksToImpactRange>160~200</ticksToImpactRange>
+      <shadowSize>(3.5,5.5)</shadowSize>
+    </skyfaller>
+  </ThingDef>
+  <ThingDef Name="OSV_ShuttleLeavingBase" ParentName="ShuttleSkyfallerBase" Abstract="True">
+    <thingClass>PassengerShuttleLeaving</thingClass>
+    <rotatable>true</rotatable>
+    <skyfaller>
+      <reversed>true</reversed>
+      <anticipationSound>Shuttle_Leaving</anticipationSound>
+      <anticipationSoundTicks>-8</anticipationSoundTicks>
+      <ticksToImpactRange>-30~-12</ticksToImpactRange>
+      <shadow>Things/Skyfaller/SkyfallerShadowRectangle</shadow>
+      <shadowSize>(3.5,5.5)</shadowSize>
+    </skyfaller>
+  </ThingDef>
+
+  <!-- =================== Cargo Shuttle =================== -->
+  <ThingDef ParentName="OSV_ShuttleBase">
+    <defName>OSV_CargoShuttle</defName>
+    <label>cargo shuttle</label>
+    <description>A heavy-lift transport shuttle built around an oversized cargo hold. It carries far more mass than a standard shuttle at the cost of slower turnaround and thirstier engines.</description>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <statBases>
+      <WorkToBuild>40000</WorkToBuild>
+    </statBases>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/CargoShuttle/CargoShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+      <shadowData>
+        <volume>(1.2, 1.0, 3.5)</volume>
+      </shadowData>
+    </graphicData>
+    <costList>
+      <Steel>300</Steel>
+      <Plasteel>200</Plasteel>
+      <ComponentIndustrial>10</ComponentIndustrial>
+      <ShuttleEngine>1</ShuttleEngine>
+    </costList>
+    <researchPrerequisites>
+      <li>OSV_CargoShuttleTech</li>
+    </researchPrerequisites>
+    <comps>
+      <li Class="CompProperties_Shuttle">
+        <shipDef>Ship_OSV_CargoShuttle</shipDef>
+      </li>
+      <li Class="CompProperties_Launchable">
+        <fuelPerTile>3.2</fuelPerTile>
+        <minFuelCost>55</minFuelCost>
+        <skyfallerLeaving>OSV_CargoShuttleLeaving</skyfallerLeaving>
+        <worldObjectDef>OSV_TravelingShuttle</worldObjectDef>
+        <cooldownTicks>3000</cooldownTicks>
+        <fixedLaunchDistanceMax>85</fixedLaunchDistanceMax>
+        <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
+      </li>
+      <li Class="CompProperties_Transporter">
+        <massCapacity>2500</massCapacity>
+        <max1PerGroup>true</max1PerGroup>
+        <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
+        <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
+        <pawnExitSound>Shuttle_PawnExit</pawnExitSound>
+        <showMassInInspectString>true</showMassInInspectString>
+      </li>
+      <li Class="CompProperties_Refuelable">
+        <fuelCapacity>600</fuelCapacity>
+        <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
+        <initialConfigurableTargetFuelLevel>600</initialConfigurableTargetFuelLevel>
+        <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
+        <fuelLabel>Chemfuel</fuelLabel>
+        <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
+        <autoRefuelPercent>1</autoRefuelPercent>
+        <showFuelGizmo>true</showFuelGizmo>
+        <drawOutOfFuelOverlay>false</drawOutOfFuelOverlay>
+        <showAllowAutoRefuelToggle>true</showAllowAutoRefuelToggle>
+        <canEjectFuel>true</canEjectFuel>
+      </li>
+    </comps>
+  </ThingDef>
+
+  <ThingDef ParentName="OSV_ShuttleIncomingBase">
+    <defName>OSV_CargoShuttleIncoming</defName>
+    <label>cargo shuttle (incoming)</label>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/CargoShuttle/CargoShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="OSV_ShuttleLeavingBase">
+    <defName>OSV_CargoShuttleLeaving</defName>
+    <label>cargo shuttle (leaving)</label>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/CargoShuttle/CargoShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+    </graphicData>
+  </ThingDef>
+
+  <TransportShipDef>
+    <defName>Ship_OSV_CargoShuttle</defName>
+    <label>cargo shuttle</label>
+    <shipThing>OSV_CargoShuttle</shipThing>
+    <arrivingSkyfaller>OSV_CargoShuttleIncoming</arrivingSkyfaller>
+    <leavingSkyfaller>OSV_CargoShuttleLeaving</leavingSkyfaller>
+    <worldObject>OSV_TravelingShuttle</worldObject>
+    <playerShuttle>true</playerShuttle>
+  </TransportShipDef>
+
+  <!-- =================== Troop Shuttle =================== -->
+  <ThingDef ParentName="OSV_ShuttleBase">
+    <defName>OSV_TroopShuttle</defName>
+    <label>troop shuttle</label>
+    <description>A fast personnel shuttle tuned for rapid insertion and extraction. It trades raw cargo capacity for speed and range.</description>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <statBases>
+      <WorkToBuild>34000</WorkToBuild>
+    </statBases>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/TroopShuttle/TroopShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+      <shadowData>
+        <volume>(1.2, 1.0, 3.5)</volume>
+      </shadowData>
+    </graphicData>
+    <costList>
+      <Steel>220</Steel>
+      <Plasteel>140</Plasteel>
+      <ComponentIndustrial>8</ComponentIndustrial>
+      <ShuttleEngine>1</ShuttleEngine>
+    </costList>
+    <researchPrerequisites>
+      <li>OSV_TroopShuttleTech</li>
+    </researchPrerequisites>
+    <comps>
+      <li Class="CompProperties_Shuttle">
+        <shipDef>Ship_OSV_TroopShuttle</shipDef>
+      </li>
+      <li Class="CompProperties_Launchable">
+        <fuelPerTile>2.2</fuelPerTile>
+        <minFuelCost>40</minFuelCost>
+        <skyfallerLeaving>OSV_TroopShuttleLeaving</skyfallerLeaving>
+        <worldObjectDef>OSV_TravelingShuttle</worldObjectDef>
+        <cooldownTicks>2000</cooldownTicks>
+        <fixedLaunchDistanceMax>120</fixedLaunchDistanceMax>
+        <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
+      </li>
+      <li Class="CompProperties_Transporter">
+        <massCapacity>1200</massCapacity>
+        <max1PerGroup>true</max1PerGroup>
+        <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
+        <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
+        <pawnExitSound>Shuttle_PawnExit</pawnExitSound>
+        <showMassInInspectString>true</showMassInInspectString>
+      </li>
+      <li Class="CompProperties_Refuelable">
+        <fuelCapacity>500</fuelCapacity>
+        <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
+        <initialConfigurableTargetFuelLevel>500</initialConfigurableTargetFuelLevel>
+        <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
+        <fuelLabel>Chemfuel</fuelLabel>
+        <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
+        <autoRefuelPercent>1</autoRefuelPercent>
+        <showFuelGizmo>true</showFuelGizmo>
+        <drawOutOfFuelOverlay>false</drawOutOfFuelOverlay>
+        <showAllowAutoRefuelToggle>true</showAllowAutoRefuelToggle>
+        <canEjectFuel>true</canEjectFuel>
+      </li>
+    </comps>
+  </ThingDef>
+
+  <ThingDef ParentName="OSV_ShuttleIncomingBase">
+    <defName>OSV_TroopShuttleIncoming</defName>
+    <label>troop shuttle (incoming)</label>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/TroopShuttle/TroopShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="OSV_ShuttleLeavingBase">
+    <defName>OSV_TroopShuttleLeaving</defName>
+    <label>troop shuttle (leaving)</label>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/TroopShuttle/TroopShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+    </graphicData>
+  </ThingDef>
+
+  <TransportShipDef>
+    <defName>Ship_OSV_TroopShuttle</defName>
+    <label>troop shuttle</label>
+    <shipThing>OSV_TroopShuttle</shipThing>
+    <arrivingSkyfaller>OSV_TroopShuttleIncoming</arrivingSkyfaller>
+    <leavingSkyfaller>OSV_TroopShuttleLeaving</leavingSkyfaller>
+    <worldObject>OSV_TravelingShuttle</worldObject>
+    <playerShuttle>true</playerShuttle>
+  </TransportShipDef>
+
+</Defs>

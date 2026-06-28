@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Biotech-only. Inherits the OSV_ShuttleBase / skyfaller bases defined in the root Defs
+       (root always loads; this folder only loads when Biotech is active - see LoadFolders.xml). -->
+
+  <!-- =================== Mechanitor Shuttle =================== -->
+  <ThingDef ParentName="OSV_ShuttleBase">
+    <defName>OSV_MechShuttle</defName>
+    <label>mechanitor shuttle</label>
+    <description>A heavy mechanitor transport built to haul mechs and their control gear between sites. High capacity, but its bulky systems make it the thirstiest of the shuttles.</description>
+    <constructionSkillPrerequisite>7</constructionSkillPrerequisite>
+    <statBases>
+      <WorkToBuild>44000</WorkToBuild>
+    </statBases>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/MechShuttle/MechShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+      <shadowData>
+        <volume>(1.2, 1.0, 3.5)</volume>
+      </shadowData>
+    </graphicData>
+    <costList>
+      <Steel>320</Steel>
+      <Plasteel>220</Plasteel>
+      <ComponentIndustrial>10</ComponentIndustrial>
+      <SubcoreBasic>4</SubcoreBasic>
+      <ShuttleEngine>1</ShuttleEngine>
+    </costList>
+    <researchPrerequisites>
+      <li>OSV_MechShuttleTech</li>
+    </researchPrerequisites>
+    <comps>
+      <li Class="CompProperties_Shuttle">
+        <shipDef>Ship_OSV_MechShuttle</shipDef>
+      </li>
+      <li Class="CompProperties_Launchable">
+        <fuelPerTile>3.3</fuelPerTile>
+        <minFuelCost>55</minFuelCost>
+        <skyfallerLeaving>OSV_MechShuttleLeaving</skyfallerLeaving>
+        <worldObjectDef>OSV_TravelingShuttle</worldObjectDef>
+        <cooldownTicks>3375</cooldownTicks>
+        <fixedLaunchDistanceMax>90</fixedLaunchDistanceMax>
+        <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
+      </li>
+      <li Class="CompProperties_Transporter">
+        <massCapacity>2000</massCapacity>
+        <max1PerGroup>true</max1PerGroup>
+        <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
+        <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
+        <pawnExitSound>Shuttle_PawnExit</pawnExitSound>
+        <showMassInInspectString>true</showMassInInspectString>
+      </li>
+      <li Class="CompProperties_Refuelable">
+        <fuelCapacity>600</fuelCapacity>
+        <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
+        <initialConfigurableTargetFuelLevel>600</initialConfigurableTargetFuelLevel>
+        <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
+        <fuelLabel>Chemfuel</fuelLabel>
+        <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
+        <autoRefuelPercent>1</autoRefuelPercent>
+        <showFuelGizmo>true</showFuelGizmo>
+        <drawOutOfFuelOverlay>false</drawOutOfFuelOverlay>
+        <showAllowAutoRefuelToggle>true</showAllowAutoRefuelToggle>
+        <canEjectFuel>true</canEjectFuel>
+      </li>
+    </comps>
+  </ThingDef>
+
+  <ThingDef ParentName="OSV_ShuttleIncomingBase">
+    <defName>OSV_MechShuttleIncoming</defName>
+    <label>mechanitor shuttle (incoming)</label>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/MechShuttle/MechShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="OSV_ShuttleLeavingBase">
+    <defName>OSV_MechShuttleLeaving</defName>
+    <label>mechanitor shuttle (leaving)</label>
+    <graphicData>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <texPath>Things/Building/OSV/MechShuttle/MechShuttle</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3,5)</drawSize>
+    </graphicData>
+  </ThingDef>
+
+  <TransportShipDef>
+    <defName>Ship_OSV_MechShuttle</defName>
+    <label>mechanitor shuttle</label>
+    <shipThing>OSV_MechShuttle</shipThing>
+    <arrivingSkyfaller>OSV_MechShuttleIncoming</arrivingSkyfaller>
+    <leavingSkyfaller>OSV_MechShuttleLeaving</leavingSkyfaller>
+    <worldObject>OSV_TravelingShuttle</worldObject>
+    <playerShuttle>true</playerShuttle>
+  </TransportShipDef>
+
+  <ResearchProjectDef>
+    <defName>OSV_MechShuttleTech</defName>
+    <label>mechanitor shuttle</label>
+    <description>Subcore-linked control racks and reinforced mech bays, enabling construction of the mechanitor shuttle.</description>
+    <baseCost>3000</baseCost>
+    <techLevel>Spacer</techLevel>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <requiredResearchFacilities>
+      <li>MultiAnalyzer</li>
+    </requiredResearchFacilities>
+    <prerequisites>
+      <li>Shuttles</li>
+    </prerequisites>
+    <researchViewX>16.0</researchViewX>
+    <researchViewY>2.6</researchViewY>
+  </ResearchProjectDef>
+
+</Defs>
