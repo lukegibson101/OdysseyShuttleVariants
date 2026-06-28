@@ -3,7 +3,7 @@
 Adds buildable transport-shuttle variants to RimWorld 1.6's **Odyssey** shuttle system, with
 distinct roles, a (planned) engine research tree, and (planned) independent crew/cargo capacity.
 
-## Status: XML scaffold (functional)
+## Status: XML scaffold — NOT yet load-tested
 
 Three buildable shuttles, each research-gated off the vanilla `Shuttles` project, built in the
 **Odyssey** architect category (each needs a `ShuttleEngine`):
@@ -14,8 +14,13 @@ Three buildable shuttles, each research-gated off the vanilla `Shuttles` project
 | Troop shuttle | 1200 | 120 | fast, long range |
 | Mechanitor shuttle | 2000 | 90 | Biotech-only (costs SubcoreBasic) |
 
-All are rotatable + paintable. Built on vanilla classes (`Building_PassengerShuttle`,
-`CompProperties_Shuttle/Launchable/Transporter/Refuelable`) — no C# required yet.
+Built on vanilla classes (`Building_PassengerShuttle` + `CompProperties_Shuttle/Launchable/
+Transporter/Refuelable`) — pure XML, no C# required.
+
+**Unverified — not loaded in-game once.** The defs are *configured* for rotation + paint
+(`rotatable=true` + `Graphic_Multi` directional art + `CutoutComplex` + `<paintable>true` + `_m`
+masks), mirroring how the comparable "Odyssey Transport Shuttle" mod does it — but whether they
+load cleanly, rotate, and paint correctly is **untested**. First load test will confirm or break this.
 
 ## Art
 
