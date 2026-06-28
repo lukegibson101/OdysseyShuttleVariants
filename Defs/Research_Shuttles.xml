@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <!-- Both hang off the vanilla Odyssey "Shuttles" research, mirroring how the base game
-       gates shuttle tech. The engine-tier tree (Advanced Propulsion -> branches) will be
-       added here in a later phase. -->
+  <!-- Unlock chain: TransportPod + MultiAnalyzer -> Troop -> Cargo -> Drone. Mech branches off
+       TransportPod + StandardMechtech (parallel; in the Biotech file). Per-shuttle capacity-UPGRADE
+       projects (cargo / fuel eff / range / crew-mech cap) are a later C# phase (stats read research). -->
 
   <ResearchProjectDef>
     <defName>OSV_CargoShuttleTech</defName>
@@ -16,11 +16,11 @@
       <li>MultiAnalyzer</li>
     </requiredResearchFacilities>
     <prerequisites>
-      <li>Shuttles</li>
+      <li>OSV_TroopShuttleTech</li>
     </prerequisites>
     <tab>OSV_ShuttlesTab</tab>
-    <researchViewX>1.0</researchViewX>
-    <researchViewY>0.5</researchViewY>
+    <researchViewX>2.5</researchViewX>
+    <researchViewY>1.0</researchViewY>
   </ResearchProjectDef>
 
   <ResearchProjectDef>
@@ -34,11 +34,12 @@
       <li>MultiAnalyzer</li>
     </requiredResearchFacilities>
     <prerequisites>
-      <li>Shuttles</li>
+      <li>TransportPod</li>
+      <li>MultiAnalyzer</li>
     </prerequisites>
     <tab>OSV_ShuttlesTab</tab>
-    <researchViewX>1.0</researchViewX>
-    <researchViewY>1.5</researchViewY>
+    <researchViewX>0.5</researchViewX>
+    <researchViewY>1.0</researchViewY>
   </ResearchProjectDef>
 
 </Defs>
