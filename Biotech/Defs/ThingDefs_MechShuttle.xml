@@ -27,7 +27,7 @@
       <Plasteel>220</Plasteel>
       <ComponentIndustrial>10</ComponentIndustrial>
       <SubcoreBasic>4</SubcoreBasic>
-      <ShuttleEngine>1</ShuttleEngine>
+      <ShuttleEngine>2</ShuttleEngine>
     </costList>
     <researchPrerequisites>
       <li>OSV_MechShuttleTech</li>

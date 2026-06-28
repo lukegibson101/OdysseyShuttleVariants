@@ -95,7 +95,7 @@
       <Steel>300</Steel>
       <Plasteel>200</Plasteel>
       <ComponentIndustrial>10</ComponentIndustrial>
-      <ShuttleEngine>1</ShuttleEngine>
+      <ShuttleEngine>2</ShuttleEngine>
     </costList>
     <researchPrerequisites>
       <li>OSV_CargoShuttleTech</li>

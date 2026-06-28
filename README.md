@@ -30,8 +30,14 @@ PassengerShuttle** frames (so all three are independent items, identical for now
 Troop/Mech sets with bespoke directional art later — see `../art/generation-prompts.md`.
 
 ## Planned (C# phases, after the Odyssey internals are documented)
-- **Independent crew/cargo capacity** (the headline feature) — custom comp + load-flow patch + MP sync.
-- **Tiered engine crafting/research tree** — craftable engine items gating shuttle stats.
+- **Typed capacity system** (the headline feature) — each craft holds **colonists / mechs / cargo**
+  independently (vs vanilla's single mass pool), with research that upgrades a craft's signature capacity.
+- **Autonomous cargo drone** (4th craft) — 0 crew; gifts cargo at settlements, drops at own caravans/bases,
+  strands if it can't afford the round trip.
+- **Mech shuttle** — 1 mechanitor + research-upgradable mech slots (base 6), no cargo.
+
+Shuttle engines are deliberately **rare** — trader/reward only, **not craftable**; each shuttle costs 1–2 + materials
+(Troop/Drone 1, Cargo/Mech 2).
 
 ## Structure
 ```
