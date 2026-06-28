@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ResearchTabDef>
+    <defName>OSV_ShuttlesTab</defName>
+    <label>transport shuttles</label>
+    <generalTitle>Transport shuttle research</generalTitle>
+    <generalDescription>Research for buildable transport-shuttle variants and in-house shuttle-engine fabrication.</generalDescription>
+  </ResearchTabDef>
+
+</Defs>

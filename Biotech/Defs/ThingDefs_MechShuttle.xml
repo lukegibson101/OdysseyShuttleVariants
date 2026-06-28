@@ -113,8 +113,9 @@
     <prerequisites>
       <li>Shuttles</li>
     </prerequisites>
-    <researchViewX>16.0</researchViewX>
-    <researchViewY>2.6</researchViewY>
+    <tab>OSV_ShuttlesTab</tab>
+    <researchViewX>1.0</researchViewX>
+    <researchViewY>2.5</researchViewY>
   </ResearchProjectDef>
 
 </Defs>
