@@ -1,0 +1,19 @@
+# RimWorld mod build output (DLL is a build artifact — never commit; the standalone
+# Harmony mod / Prepatcher provides the runtime 0Harmony.dll)
+Assemblies/*.dll
+Assemblies/*.pdb
+[Oo]bj/
+[Bb]in/
+*.csproj.user
+.vs/
+.idea/
+
+# Placeholder art cloned from vanilla (throwaway, regenerable from the game install).
+# Gitignored so we don't redistribute Ludeon's textures. When ORIGINAL art lands, commit it
+# (add `!Textures/Things/Building/OSV/<Shuttle>/...` un-ignore rules then).
+Textures/
+Biotech/Textures/
+
+# OS cruft
+Thumbs.db
+.DS_Store
