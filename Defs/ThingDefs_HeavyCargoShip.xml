@@ -12,13 +12,14 @@
     <label>heavy cargo ship</label>
     <description>A massive four-engine cargo lifter built for moving freight by the tonne. Its cavernous hold dwarfs a standard cargo shuttle, but it is slow to cycle, drinks fuel, and cannot range as far.</description>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
-    <size>(7,4)</size>
+    <size>(10,6)</size>
     <rotatable>false</rotatable>
     <!-- base is defaultPlacingRot=East (tall shuttles); this craft's art is a WIDE profile, so
          place it North = no 90° rotation, art draws wide as drawn. East-only single-frame placeholder. -->
     <defaultPlacingRot>North</defaultPlacingRot>
     <!-- base interactionCellOffset (2,0,0) suits the tall shuttles; this wide ship's cargo ramp is at
-         the bottom-centre, so put the boarding cell just south of centre, in front of the doors. -->
+         the bottom-centre, so put the boarding cell just south of centre, in front of the doors.
+         At 10x6 the south edge is z=-2, so (0,0,-3) sits right against the hull. -->
     <interactionCellOffset>(0,0,-3)</interactionCellOffset>
     <statBases>
       <MaxHitPoints>1100</MaxHitPoints>
@@ -28,9 +29,9 @@
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(8, 4.65)</drawSize>
+      <drawSize>(11, 6.4)</drawSize>
       <shadowData>
-        <volume>(6.0, 1.0, 3.0)</volume>
+        <volume>(9.0, 1.0, 4.5)</volume>
       </shadowData>
     </graphicData>
     <uiIconScale>0.85</uiIconScale>
@@ -88,7 +89,7 @@
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(8, 4.65)</drawSize>
+      <drawSize>(11, 6.4)</drawSize>
     </graphicData>
   </ThingDef>
   <ThingDef ParentName="OSV_ShuttleLeavingBase">
@@ -99,7 +100,7 @@
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(8, 4.65)</drawSize>
+      <drawSize>(11, 6.4)</drawSize>
     </graphicData>
   </ThingDef>
 

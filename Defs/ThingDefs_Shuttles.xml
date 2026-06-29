@@ -79,6 +79,13 @@
     <label>cargo shuttle</label>
     <description>A heavy-lift transport shuttle built around an oversized cargo hold. It carries far more mass than a standard shuttle at the cost of slower turnaround and thirstier engines.</description>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <!-- Bigger footprint than the base 3x5 shuttle: this is a hauler. Kept odd x odd (like every
+         vanilla shuttle) so the 4-facing rotation stays clean. drawSize 4.3x6.6 sits inside 5x7
+         with a small vanilla-style margin. -->
+    <size>(5,7)</size>
+    <!-- east edge is now at x=2 (wider hull), so the side boarding cell shifts out one from the
+         base (2,0,0) to keep it just off the hull. -->
+    <interactionCellOffset>(3,0,0)</interactionCellOffset>
     <statBases>
       <WorkToBuild>40000</WorkToBuild>
     </statBases>
@@ -91,10 +98,6 @@
         <volume>(1.2, 1.0, 3.5)</volume>
       </shadowData>
     </graphicData>
-    <!-- drawSize 4.3x6.6 on a 3x5 footprint makes the architect icon render at ~1.32x (overflow).
-         uiIconScale 0.7 cancels that back to ~0.92x: fills the button, slightly bigger than the
-         other shuttles (it's the big hauler) without bleeding past the edges. -->
-    <uiIconScale>0.7</uiIconScale>
     <costList>
       <Steel>300</Steel>
       <Plasteel>200</Plasteel>
