@@ -39,6 +39,10 @@ Troop/Mech sets with bespoke directional art later — see `../art/generation-pr
 Shuttle engines are deliberately **rare** — trader/reward only, **not craftable**; each shuttle costs 1–2 + materials
 (Troop/Drone 1, Cargo/Mech 2).
 
+## TODO / polish
+- **Paint masks** — refine which areas each craft paints. The auto colour-match (`tools/remask.py`) is approximate;
+  hand-edit the `_<facing>m.png` masks (red = paints, black = keeps colour) for precise accent zones.
+
 ## Structure
 ```
 About/About.xml              mod metadata + Ludeon disclaimer
