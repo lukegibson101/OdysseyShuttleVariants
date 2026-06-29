@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <!-- Biotech-only. Inherits the OSV_ShuttleBase / skyfaller bases defined in the root Defs
-       (root always loads; this folder only loads when Biotech is active - see LoadFolders.xml). -->
-
-  <!-- =================== Mechanitor Shuttle =================== -->
+  <!-- Autonomous cargo drone. STUB: a small, fast, long-range, low-cargo buildable shuttle so it's
+       in the lineup + testable now. The autonomous behaviour (0-crew launch, gift-at-settlement,
+       strand-if-low-fuel) is the later C# phase; for now it flies like a normal player shuttle. -->
   <ThingDef ParentName="OSV_ShuttleBase">
-    <defName>OSV_MechShuttle</defName>
-    <label>mechanitor shuttle</label>
-    <description>A heavy mechanitor transport built to haul mechs and their control gear between sites. High capacity, but its bulky systems make it the thirstiest of the shuttles.</description>
-    <constructionSkillPrerequisite>7</constructionSkillPrerequisite>
+    <defName>OSV_DroneShuttle</defName>
+    <label>transport drone</label>
+    <description>A small autonomous cargo drone for long-range, hands-off deliveries. (Full autonomous behaviour arrives in a later update; for now it flies like a standard shuttle.)</description>
+    <constructionSkillPrerequisite>5</constructionSkillPrerequisite>
     <statBases>
-      <WorkToBuild>44000</WorkToBuild>
+      <WorkToBuild>26000</WorkToBuild>
     </statBases>
     <graphicData>
       <graphicClass>Graphic_Multi</graphicClass>
-      <texPath>Things/Building/OSV/MechShuttle/MechShuttle</texPath>
+      <texPath>Things/Building/OSV/DroneShuttle/DroneShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(2.4,5)</drawSize>
       <shadowData>
@@ -23,30 +22,29 @@
       </shadowData>
     </graphicData>
     <costList>
-      <Steel>320</Steel>
-      <Plasteel>220</Plasteel>
-      <ComponentIndustrial>10</ComponentIndustrial>
-      <SubcoreBasic>4</SubcoreBasic>
-      <ShuttleEngine>2</ShuttleEngine>
+      <Steel>150</Steel>
+      <Plasteel>90</Plasteel>
+      <ComponentIndustrial>6</ComponentIndustrial>
+      <ShuttleEngine>1</ShuttleEngine>
     </costList>
     <researchPrerequisites>
-      <li>OSV_MechShuttleTech</li>
+      <li>OSV_DroneShuttleTech</li>
     </researchPrerequisites>
     <comps>
       <li Class="CompProperties_Shuttle">
-        <shipDef>Ship_OSV_MechShuttle</shipDef>
+        <shipDef>Ship_OSV_DroneShuttle</shipDef>
       </li>
       <li Class="CompProperties_Launchable">
-        <fuelPerTile>3.3</fuelPerTile>
-        <minFuelCost>55</minFuelCost>
-        <skyfallerLeaving>OSV_MechShuttleLeaving</skyfallerLeaving>
+        <fuelPerTile>1.5</fuelPerTile>
+        <minFuelCost>30</minFuelCost>
+        <skyfallerLeaving>OSV_DroneShuttleLeaving</skyfallerLeaving>
         <worldObjectDef>OSV_TravelingShuttle</worldObjectDef>
-        <cooldownTicks>3375</cooldownTicks>
-        <fixedLaunchDistanceMax>90</fixedLaunchDistanceMax>
+        <cooldownTicks>1500</cooldownTicks>
+        <fixedLaunchDistanceMax>200</fixedLaunchDistanceMax>
         <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
       </li>
       <li Class="CompProperties_Transporter">
-        <massCapacity>2000</massCapacity>
+        <massCapacity>500</massCapacity>
         <max1PerGroup>true</max1PerGroup>
         <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
         <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
@@ -54,9 +52,9 @@
         <showMassInInspectString>true</showMassInInspectString>
       </li>
       <li Class="CompProperties_Refuelable">
-        <fuelCapacity>600</fuelCapacity>
+        <fuelCapacity>500</fuelCapacity>
         <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
-        <initialConfigurableTargetFuelLevel>600</initialConfigurableTargetFuelLevel>
+        <initialConfigurableTargetFuelLevel>500</initialConfigurableTargetFuelLevel>
         <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
         <fuelLabel>Chemfuel</fuelLabel>
         <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
@@ -70,54 +68,52 @@
   </ThingDef>
 
   <ThingDef ParentName="OSV_ShuttleIncomingBase">
-    <defName>OSV_MechShuttleIncoming</defName>
-    <label>mechanitor shuttle (incoming)</label>
+    <defName>OSV_DroneShuttleIncoming</defName>
+    <label>transport drone (incoming)</label>
     <graphicData>
       <graphicClass>Graphic_Multi</graphicClass>
-      <texPath>Things/Building/OSV/MechShuttle/MechShuttle</texPath>
+      <texPath>Things/Building/OSV/DroneShuttle/DroneShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(2.4,5)</drawSize>
     </graphicData>
   </ThingDef>
   <ThingDef ParentName="OSV_ShuttleLeavingBase">
-    <defName>OSV_MechShuttleLeaving</defName>
-    <label>mechanitor shuttle (leaving)</label>
+    <defName>OSV_DroneShuttleLeaving</defName>
+    <label>transport drone (leaving)</label>
     <graphicData>
       <graphicClass>Graphic_Multi</graphicClass>
-      <texPath>Things/Building/OSV/MechShuttle/MechShuttle</texPath>
+      <texPath>Things/Building/OSV/DroneShuttle/DroneShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(2.4,5)</drawSize>
     </graphicData>
   </ThingDef>
 
   <TransportShipDef>
-    <defName>Ship_OSV_MechShuttle</defName>
-    <label>mechanitor shuttle</label>
-    <shipThing>OSV_MechShuttle</shipThing>
-    <arrivingSkyfaller>OSV_MechShuttleIncoming</arrivingSkyfaller>
-    <leavingSkyfaller>OSV_MechShuttleLeaving</leavingSkyfaller>
+    <defName>Ship_OSV_DroneShuttle</defName>
+    <label>transport drone</label>
+    <shipThing>OSV_DroneShuttle</shipThing>
+    <arrivingSkyfaller>OSV_DroneShuttleIncoming</arrivingSkyfaller>
+    <leavingSkyfaller>OSV_DroneShuttleLeaving</leavingSkyfaller>
     <worldObject>OSV_TravelingShuttle</worldObject>
     <playerShuttle>true</playerShuttle>
   </TransportShipDef>
 
   <ResearchProjectDef>
-    <defName>OSV_MechShuttleTech</defName>
-    <label>mechanitor shuttle</label>
-    <description>Subcore-linked control racks and reinforced mech bays, enabling construction of the mechanitor shuttle.</description>
-    <baseCost>3000</baseCost>
+    <defName>OSV_DroneShuttleTech</defName>
+    <label>transport drone</label>
+    <description>Autonomous flight control and lightweight drone frames, enabling construction of the transport drone.</description>
+    <baseCost>2500</baseCost>
     <techLevel>Spacer</techLevel>
     <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
     <requiredResearchFacilities>
       <li>MultiAnalyzer</li>
     </requiredResearchFacilities>
     <prerequisites>
-      <li>TransportPod</li>
-      <li>MultiAnalyzer</li>
-      <li>StandardMechtech</li>
+      <li>OSV_CargoShuttleTech</li>
     </prerequisites>
     <tab>OSV_ShuttlesTab</tab>
-    <researchViewX>1.0</researchViewX>
-    <researchViewY>2.5</researchViewY>
+    <researchViewX>4.5</researchViewX>
+    <researchViewY>1.0</researchViewY>
   </ResearchProjectDef>
 
 </Defs>

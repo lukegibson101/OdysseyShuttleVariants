@@ -86,7 +86,7 @@
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/CargoShuttle/CargoShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(3,5)</drawSize>
+      <drawSize>(2.4,5)</drawSize>
       <shadowData>
         <volume>(1.2, 1.0, 3.5)</volume>
       </shadowData>
@@ -144,7 +144,7 @@
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/CargoShuttle/CargoShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(3,5)</drawSize>
+      <drawSize>(2.4,5)</drawSize>
     </graphicData>
   </ThingDef>
   <ThingDef ParentName="OSV_ShuttleLeavingBase">
@@ -154,7 +154,7 @@
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/CargoShuttle/CargoShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(3,5)</drawSize>
+      <drawSize>(2.4,5)</drawSize>
     </graphicData>
   </ThingDef>
 
@@ -181,7 +181,7 @@
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/TroopShuttle/TroopShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(3,5)</drawSize>
+      <drawSize>(2.4,5)</drawSize>
       <shadowData>
         <volume>(1.2, 1.0, 3.5)</volume>
       </shadowData>
@@ -239,7 +239,7 @@
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/TroopShuttle/TroopShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(3,5)</drawSize>
+      <drawSize>(2.4,5)</drawSize>
     </graphicData>
   </ThingDef>
   <ThingDef ParentName="OSV_ShuttleLeavingBase">
@@ -249,7 +249,7 @@
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/TroopShuttle/TroopShuttle</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(3,5)</drawSize>
+      <drawSize>(2.4,5)</drawSize>
     </graphicData>
   </ThingDef>
 

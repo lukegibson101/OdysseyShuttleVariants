@@ -8,11 +8,8 @@ Assemblies/*.pdb
 .vs/
 .idea/
 
-# Placeholder art cloned from vanilla (throwaway, regenerable from the game install).
-# Gitignored so we don't redistribute Ludeon's textures. When ORIGINAL art lands, commit it
-# (add `!Textures/Things/Building/OSV/<Shuttle>/...` un-ignore rules then).
-Textures/
-Biotech/Textures/
+# Mod art IS tracked: custom AI-generated sprites plus a few vanilla bases used as permitted by
+# Ludeon's modding terms (disclaimer ships in About.xml). Only the build output above is ignored.
 
 # OS cruft
 Thumbs.db
