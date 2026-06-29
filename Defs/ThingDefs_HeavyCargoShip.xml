@@ -29,7 +29,9 @@
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(11, 6.4)</drawSize>
+      <!-- sized to fill the 10x6 footprint snugly so the selection box hugs the hull (vanilla-style):
+           width fills 10, depth 5.8 sits just inside 6. -->
+      <drawSize>(10, 5.8)</drawSize>
       <shadowData>
         <volume>(9.0, 1.0, 4.5)</volume>
       </shadowData>
@@ -89,7 +91,7 @@
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(11, 6.4)</drawSize>
+      <drawSize>(10, 5.8)</drawSize>
     </graphicData>
   </ThingDef>
   <ThingDef ParentName="OSV_ShuttleLeavingBase">
@@ -100,7 +102,7 @@
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(11, 6.4)</drawSize>
+      <drawSize>(10, 5.8)</drawSize>
     </graphicData>
   </ThingDef>
 

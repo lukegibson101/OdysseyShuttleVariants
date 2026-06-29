@@ -57,7 +57,31 @@
       <anticipationSound>Shuttle_Landing</anticipationSound>
       <anticipationSoundTicks>200</anticipationSoundTicks>
       <ticksToImpactRange>160~200</ticksToImpactRange>
+      <minimalRoofDestruction>true</minimalRoofDestruction>
       <shadowSize>(3.5,5.5)</shadowSize>
+      <!-- ShuttleSkyfallerBase doesn't define these; PassengerShuttleIncoming.GetDrawPositionAndRotation
+           dereferences them every frame, so they MUST be set or the landing animation NREs. Copied from
+           vanilla PassengerShuttleIncoming. -->
+      <rotationCurve>
+        <points>
+          <li>(0,30)</li>
+          <li>(0.5,5)</li>
+          <li>(0.9,-5)</li>
+          <li>(0.95,0)</li>
+        </points>
+      </rotationCurve>
+      <zPositionCurve>
+        <points>
+          <li>(0.95,2.5)</li>
+          <li>(1,0)</li>
+        </points>
+      </zPositionCurve>
+      <speedCurve>
+        <points>
+          <li>(0.6,0.6)</li>
+          <li>(0.95,0.1)</li>
+        </points>
+      </speedCurve>
     </skyfaller>
   </ThingDef>
   <ThingDef Name="OSV_ShuttleLeavingBase" ParentName="ShuttleSkyfallerBase" Abstract="True">
@@ -68,8 +92,32 @@
       <anticipationSound>Shuttle_Leaving</anticipationSound>
       <anticipationSoundTicks>-8</anticipationSoundTicks>
       <ticksToImpactRange>-30~-12</ticksToImpactRange>
+      <moteSpawnTime>0.05</moteSpawnTime>
       <shadow>Things/Skyfaller/SkyfallerShadowRectangle</shadow>
       <shadowSize>(3.5,5.5)</shadowSize>
+      <motesPerCell>1</motesPerCell>
+      <!-- ShuttleSkyfallerBase doesn't define these; PassengerShuttleLeaving.GetDrawPositionAndRotation
+           dereferences them every frame, so they MUST be set or the launch animation NREs. Copied from
+           vanilla PassengerShuttleLeaving. -->
+      <rotationCurve>
+        <points>
+          <li>(0,0)</li>
+          <li>(0.15,10)</li>
+          <li>(0.5,-5)</li>
+        </points>
+      </rotationCurve>
+      <zPositionCurve>
+        <points>
+          <li>(0,0)</li>
+          <li>(0.08,2)</li>
+        </points>
+      </zPositionCurve>
+      <speedCurve>
+        <points>
+          <li>(0,0.2)</li>
+          <li>(0.4,0.7)</li>
+        </points>
+      </speedCurve>
     </skyfaller>
   </ThingDef>
 
@@ -79,12 +127,11 @@
     <label>cargo shuttle</label>
     <description>A heavy-lift transport shuttle built around an oversized cargo hold. It carries far more mass than a standard shuttle at the cost of slower turnaround and thirstier engines.</description>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
-    <!-- Bigger footprint than the base 3x5 shuttle: this is a hauler. Kept odd x odd (like every
-         vanilla shuttle) so the 4-facing rotation stays clean. drawSize 4.3x6.6 sits inside 5x7
-         with a small vanilla-style margin. -->
-    <size>(5,7)</size>
-    <!-- east edge is now at x=2 (wider hull), so the side boarding cell shifts out one from the
-         base (2,0,0) to keep it just off the hull. -->
+    <!-- Footprint hugs the sprite so the selection box sits tight on the hull (like vanilla).
+         drawSize 4.3x6.6 only hugs at width 4 (odd 3 overflows, 5 is loose) - so this is even,
+         the one craft where we trade the odd-rotation rule for a tight box. Watch E/W rotation. -->
+    <size>(4,6)</size>
+    <!-- even width 4 -> east edge at x=2, so the side boarding cell sits at x=3, just off the hull. -->
     <interactionCellOffset>(3,0,0)</interactionCellOffset>
     <statBases>
       <WorkToBuild>40000</WorkToBuild>
@@ -98,6 +145,8 @@
         <volume>(1.2, 1.0, 3.5)</volume>
       </shadowData>
     </graphicData>
+    <!-- drawSize 6.6 vs 4x6 footprint overflows the architect button ~1.1x; 0.9 brings it to ~0.99. -->
+    <uiIconScale>0.9</uiIconScale>
     <costList>
       <Steel>300</Steel>
       <Plasteel>200</Plasteel>
