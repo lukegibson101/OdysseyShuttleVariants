@@ -24,6 +24,24 @@
   </ResearchProjectDef>
 
   <ResearchProjectDef>
+    <defName>OSV_HeavyCargoShipTech</defName>
+    <label>heavy cargo ship</label>
+    <description>Oversized airframes, quad-engine mounts and reinforced load-bearing decks, enabling construction of the heavy cargo ship.</description>
+    <baseCost>4000</baseCost>
+    <techLevel>Spacer</techLevel>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <requiredResearchFacilities>
+      <li>MultiAnalyzer</li>
+    </requiredResearchFacilities>
+    <prerequisites>
+      <li>OSV_CargoShuttleTech</li>
+    </prerequisites>
+    <tab>OSV_ShuttlesTab</tab>
+    <researchViewX>4.5</researchViewX>
+    <researchViewY>1.0</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
     <defName>OSV_TroopShuttleTech</defName>
     <label>troop shuttle</label>
     <description>Lightweight airframes and rapid-cycle launch systems, enabling construction of the troop shuttle.</description>

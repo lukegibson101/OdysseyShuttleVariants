@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- =================== Heavy Cargo Ship ===================
+       The biggest hauler in the line: roughly double the cargo shuttle's hold, four engines,
+       a large footprint, slow turnaround and thirsty engines. Gated behind the cargo shuttle.
+       ART NOTE: placeholder is a single ¾ "hero" frame (Orca-inspired, clean-room original) used
+       NON-ROTATABLE for now. Proper top-down N/E/S directional frames are a follow-up; once they
+       exist, switch graphicClass back to Graphic_Multi + rotatable true like the other shuttles. -->
+  <ThingDef ParentName="OSV_ShuttleBase">
+    <defName>OSV_HeavyCargoShip</defName>
+    <label>heavy cargo ship</label>
+    <description>A massive four-engine cargo lifter built for moving freight by the tonne. Its cavernous hold dwarfs a standard cargo shuttle, but it is slow to cycle, drinks fuel, and cannot range as far.</description>
+    <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+    <size>(7,4)</size>
+    <rotatable>false</rotatable>
+    <!-- base is defaultPlacingRot=East (tall shuttles); this craft's art is a WIDE profile, so
+         place it North = no 90° rotation, art draws wide as drawn. East-only single-frame placeholder. -->
+    <defaultPlacingRot>North</defaultPlacingRot>
+    <!-- base interactionCellOffset (2,0,0) suits the tall shuttles; this wide ship's cargo ramp is at
+         the bottom-centre, so put the boarding cell just south of centre, in front of the doors. -->
+    <interactionCellOffset>(0,0,-3)</interactionCellOffset>
+    <statBases>
+      <MaxHitPoints>1100</MaxHitPoints>
+      <WorkToBuild>60000</WorkToBuild>
+    </statBases>
+    <graphicData>
+      <graphicClass>Graphic_Single</graphicClass>
+      <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(8, 4.65)</drawSize>
+      <shadowData>
+        <volume>(6.0, 1.0, 3.0)</volume>
+      </shadowData>
+    </graphicData>
+    <uiIconScale>0.85</uiIconScale>
+    <costList>
+      <Steel>600</Steel>
+      <Plasteel>400</Plasteel>
+      <ComponentIndustrial>20</ComponentIndustrial>
+      <ShuttleEngine>4</ShuttleEngine>
+    </costList>
+    <researchPrerequisites>
+      <li>OSV_HeavyCargoShipTech</li>
+    </researchPrerequisites>
+    <comps>
+      <li Class="CompProperties_Shuttle">
+        <shipDef>Ship_OSV_HeavyCargoShip</shipDef>
+      </li>
+      <li Class="CompProperties_Launchable">
+        <fuelPerTile>5.0</fuelPerTile>
+        <minFuelCost>80</minFuelCost>
+        <skyfallerLeaving>OSV_HeavyCargoShipLeaving</skyfallerLeaving>
+        <worldObjectDef>OSV_TravelingShuttle</worldObjectDef>
+        <cooldownTicks>4000</cooldownTicks>
+        <fixedLaunchDistanceMax>70</fixedLaunchDistanceMax>
+        <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
+      </li>
+      <li Class="CompProperties_Transporter">
+        <massCapacity>4500</massCapacity>
+        <max1PerGroup>true</max1PerGroup>
+        <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
+        <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
+        <pawnExitSound>Shuttle_PawnExit</pawnExitSound>
+        <showMassInInspectString>true</showMassInInspectString>
+      </li>
+      <li Class="CompProperties_Refuelable">
+        <fuelCapacity>900</fuelCapacity>
+        <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
+        <initialConfigurableTargetFuelLevel>900</initialConfigurableTargetFuelLevel>
+        <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
+        <fuelLabel>Chemfuel</fuelLabel>
+        <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
+        <autoRefuelPercent>1</autoRefuelPercent>
+        <showFuelGizmo>true</showFuelGizmo>
+        <drawOutOfFuelOverlay>false</drawOutOfFuelOverlay>
+        <showAllowAutoRefuelToggle>true</showAllowAutoRefuelToggle>
+        <canEjectFuel>true</canEjectFuel>
+      </li>
+    </comps>
+  </ThingDef>
+
+  <ThingDef ParentName="OSV_ShuttleIncomingBase">
+    <defName>OSV_HeavyCargoShipIncoming</defName>
+    <label>heavy cargo ship (incoming)</label>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <graphicClass>Graphic_Single</graphicClass>
+      <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(8, 4.65)</drawSize>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="OSV_ShuttleLeavingBase">
+    <defName>OSV_HeavyCargoShipLeaving</defName>
+    <label>heavy cargo ship (leaving)</label>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <graphicClass>Graphic_Single</graphicClass>
+      <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(8, 4.65)</drawSize>
+    </graphicData>
+  </ThingDef>
+
+  <TransportShipDef>
+    <defName>Ship_OSV_HeavyCargoShip</defName>
+    <label>heavy cargo ship</label>
+    <shipThing>OSV_HeavyCargoShip</shipThing>
+    <arrivingSkyfaller>OSV_HeavyCargoShipIncoming</arrivingSkyfaller>
+    <leavingSkyfaller>OSV_HeavyCargoShipLeaving</leavingSkyfaller>
+    <worldObject>OSV_TravelingShuttle</worldObject>
+    <playerShuttle>true</playerShuttle>
+  </TransportShipDef>
+
+</Defs>

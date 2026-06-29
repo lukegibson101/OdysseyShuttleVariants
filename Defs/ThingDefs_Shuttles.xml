@@ -91,6 +91,10 @@
         <volume>(1.2, 1.0, 3.5)</volume>
       </shadowData>
     </graphicData>
+    <!-- drawSize 4.3x6.6 on a 3x5 footprint makes the architect icon render at ~1.32x (overflow).
+         uiIconScale 0.7 cancels that back to ~0.92x: fills the button, slightly bigger than the
+         other shuttles (it's the big hauler) without bleeding past the edges. -->
+    <uiIconScale>0.7</uiIconScale>
     <costList>
       <Steel>300</Steel>
       <Plasteel>200</Plasteel>
