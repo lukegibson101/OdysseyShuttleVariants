@@ -160,6 +160,9 @@
       <li Class="CompProperties_Shuttle">
         <shipDef>Ship_OSV_CargoShuttle</shipDef>
       </li>
+      <li Class="OdysseyShuttleVariants.CompProperties_TypedShuttleCapacity">
+        <maxColonists>4</maxColonists>
+      </li>
       <li Class="CompProperties_Launchable">
         <fuelPerTile>3.2</fuelPerTile>
         <minFuelCost>55</minFuelCost>
@@ -254,6 +257,10 @@
     <comps>
       <li Class="CompProperties_Shuttle">
         <shipDef>Ship_OSV_TroopShuttle</shipDef>
+      </li>
+      <li Class="OdysseyShuttleVariants.CompProperties_TypedShuttleCapacity">
+        <!-- the squad-hauler: high crew. 12 clears a 10-colonist quest with headroom. -->
+        <maxColonists>12</maxColonists>
       </li>
       <li Class="CompProperties_Launchable">
         <fuelPerTile>2.2</fuelPerTile>

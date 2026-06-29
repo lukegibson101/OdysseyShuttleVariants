@@ -50,6 +50,9 @@
       <li Class="CompProperties_Shuttle">
         <shipDef>Ship_OSV_HeavyCargoShip</shipDef>
       </li>
+      <li Class="OdysseyShuttleVariants.CompProperties_TypedShuttleCapacity">
+        <maxColonists>4</maxColonists>
+      </li>
       <li Class="CompProperties_Launchable">
         <fuelPerTile>5.0</fuelPerTile>
         <minFuelCost>80</minFuelCost>

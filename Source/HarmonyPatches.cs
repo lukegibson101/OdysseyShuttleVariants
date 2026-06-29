@@ -1,0 +1,237 @@
+using System.Collections.Generic;
+using HarmonyLib;
+using RimWorld;
+using UnityEngine;
+using Verse;
+
+namespace OdysseyShuttleVariants
+{
+    [StaticConstructorOnStartup]
+    public static class HarmonyBootstrap
+    {
+        static HarmonyBootstrap()
+        {
+            new Harmony("luke.odysseyshuttlevariants").PatchAll();
+        }
+    }
+
+    // Reflective access to the private bits of Dialog_LoadTransporters we need.
+    internal static class DialogAccess
+    {
+        public static readonly AccessTools.FieldRef<Dialog_LoadTransporters, List<CompTransporter>> Transporters =
+            AccessTools.FieldRefAccess<Dialog_LoadTransporters, List<CompTransporter>>("transporters");
+
+        public static readonly AccessTools.FieldRef<Dialog_LoadTransporters, List<TransferableOneWay>> Transferables =
+            AccessTools.FieldRefAccess<Dialog_LoadTransporters, List<TransferableOneWay>>("transferables");
+
+        public static CompTypedShuttleCapacity GetComp(Dialog_LoadTransporters dlg)
+        {
+            List<CompTransporter> t = Transporters(dlg);
+            if (t == null || t.Count == 0 || t[0].parent == null) return null;
+            return t[0].parent.TryGetComp<CompTypedShuttleCapacity>();
+        }
+
+        // Colonists currently ticked to load.
+        public static int SelectedColonists(Dialog_LoadTransporters dlg)
+        {
+            int n = 0;
+            List<TransferableOneWay> list = Transferables(dlg);
+            if (list != null)
+            {
+                foreach (TransferableOneWay tr in list)
+                {
+                    if (tr.CountToTransfer > 0 && tr.AnyThing is Pawn p && p.IsColonist) n++;
+                }
+            }
+            return n;
+        }
+
+        // Any pawns (colonists or animals) currently ticked to load.
+        public static int SelectedPawns(Dialog_LoadTransporters dlg)
+        {
+            int n = 0;
+            List<TransferableOneWay> list = Transferables(dlg);
+            if (list != null)
+            {
+                foreach (TransferableOneWay tr in list)
+                {
+                    if (tr.CountToTransfer > 0 && tr.AnyThing is Pawn) n += tr.CountToTransfer;
+                }
+            }
+            return n;
+        }
+    }
+
+    // Live passenger readout in the load dialog header (top-left), red when over the cap.
+    [HarmonyPatch(typeof(Dialog_LoadTransporters), "DoWindowContents")]
+    public static class Patch_Dialog_DoWindowContents
+    {
+        public static void Postfix(Dialog_LoadTransporters __instance)
+        {
+            CompTypedShuttleCapacity comp = DialogAccess.GetComp(__instance);
+            if (comp == null) return;
+
+            string label;
+            bool over;
+            if (comp.Props.noPawns)
+            {
+                int pawns = DialogAccess.SelectedPawns(__instance);
+                over = pawns > 0;
+                label = over ? "No crew allowed (cargo only)" : "Autonomous: cargo only";
+            }
+            else if (comp.Props.maxColonists >= 0)
+            {
+                int n = DialogAccess.SelectedColonists(__instance);
+                over = n > comp.Props.maxColonists;
+                label = "Passengers: " + n + " / " + comp.Props.maxColonists;
+            }
+            else
+            {
+                return;
+            }
+
+            Color oldColor = GUI.color;
+            TextAnchor oldAnchor = Text.Anchor;
+            GUI.color = over ? ColorLibrary.RedReadable : Color.white;
+            Text.Anchor = TextAnchor.UpperLeft;
+            Widgets.Label(new Rect(12f, 6f, 320f, 25f), label);
+            GUI.color = oldColor;
+            Text.Anchor = oldAnchor;
+        }
+    }
+
+    // Block Accept when over the cap (or any pawn on a cargo-only drone), with a message.
+    [HarmonyPatch(typeof(Dialog_LoadTransporters), "CheckForErrors")]
+    public static class Patch_Dialog_CheckForErrors
+    {
+        public static void Postfix(Dialog_LoadTransporters __instance, List<Pawn> pawns, ref bool __result)
+        {
+            if (!__result) return; // already failing for another reason
+            CompTypedShuttleCapacity comp = DialogAccess.GetComp(__instance);
+            if (comp == null) return;
+
+            if (comp.Props.noPawns)
+            {
+                if (pawns != null && pawns.Count > 0)
+                {
+                    Messages.Message("This drone is autonomous and carries cargo only - no crew.",
+                        MessageTypeDefOf.RejectInput, historical: false);
+                    __result = false;
+                }
+                return;
+            }
+
+            if (comp.Props.requireMechanitor && pawns != null)
+            {
+                foreach (Pawn p in pawns)
+                {
+                    if (p.IsColonist && p.mechanitor == null)
+                    {
+                        Messages.Message("This craft can only be piloted by a mechanitor.",
+                            MessageTypeDefOf.RejectInput, historical: false);
+                        __result = false;
+                        return;
+                    }
+                }
+            }
+
+            if (comp.Props.maxColonists >= 0 && pawns != null)
+            {
+                int colonists = 0;
+                foreach (Pawn p in pawns)
+                {
+                    if (p.IsColonist) colonists++;
+                }
+                if (colonists > comp.Props.maxColonists)
+                {
+                    Messages.Message("This shuttle can carry at most " + comp.Props.maxColonists + " passengers.",
+                        MessageTypeDefOf.RejectInput, historical: false);
+                    __result = false;
+                }
+            }
+        }
+    }
+
+    // The catch-all enforcement point. IsAllowed feeds the enter float-menu (via IsAllowedNow),
+    // JobDriver_EnterTransporter's FailOn, and auto-loading - so capping it here covers EVERY load
+    // path (right-click "enter", multi-select orders, the dialog's actual loading), not just the
+    // dialog's Accept button. Colonists over the cap have their enter-job fail as others board.
+    [HarmonyPatch(typeof(CompShuttle), "IsAllowed")]
+    public static class Patch_CompShuttle_IsAllowed
+    {
+        // Drone (no pawns) and mech-ship (mechanitor-only) legitimately filter WHICH pawns may board,
+        // so they belong here - this also cleanly hides invalid pawns from the load dialog's list.
+        // The colonist COUNT cap is deliberately NOT here: IsAllowed also builds the dialog's
+        // available-pawn list (TransporterUtility.AllSendablePawns), so capping it would make the
+        // other colonists vanish once full and block swapping. The count is enforced on the
+        // enter-job instead (see Patch_JobDriver_EnterTransporter).
+        public static void Postfix(CompShuttle __instance, Thing t, ref bool __result)
+        {
+            if (!__result) return;
+            CompTypedShuttleCapacity comp = __instance.parent.TryGetComp<CompTypedShuttleCapacity>();
+            if (comp == null || !(t is Pawn pawn)) return;
+
+            if (comp.Props.noPawns)
+            {
+                __result = false;
+            }
+            else if (comp.Props.requireMechanitor && pawn.IsColonist && pawn.mechanitor == null)
+            {
+                __result = false;
+            }
+        }
+    }
+
+    // Colonist seat-cap enforcement on the actual enter-job, so it catches EVERY load path (dialog
+    // loading and map right-click / multi-select orders) without filtering the dialog's pawn list.
+    // The over-cap colonist's enter-job fails as the others fill the seats, with a throttled alert.
+    [HarmonyPatch(typeof(JobDriver_EnterTransporter), "MakeNewToils")]
+    public static class Patch_JobDriver_EnterTransporter
+    {
+        private static int lastMsgTick = -9999;
+
+        public static void Postfix(JobDriver_EnterTransporter __instance)
+        {
+            CompShuttle shuttle = __instance.Shuttle;
+            if (shuttle == null) return;
+            ThingWithComps parent = shuttle.parent;
+            CompTypedShuttleCapacity comp = parent.TryGetComp<CompTypedShuttleCapacity>();
+            if (comp == null || comp.Props.noPawns || comp.Props.maxColonists < 0) return;
+
+            Pawn pawn = __instance.pawn;
+            __instance.AddFailCondition(delegate
+            {
+                if (pawn == null || !pawn.IsColonist) return false;
+                if (ColonistsAboard(parent, pawn) < comp.Props.maxColonists) return false;
+                Alert(parent, parent.LabelShortCap + " is at maximum occupancy (" + comp.Props.maxColonists + " passengers).");
+                return true;
+            });
+        }
+
+        private static int ColonistsAboard(ThingWithComps shuttle, Pawn excluding)
+        {
+            int n = 0;
+            CompTransporter transporter = shuttle.TryGetComp<CompTransporter>();
+            if (transporter != null)
+            {
+                foreach (Thing th in transporter.innerContainer)
+                {
+                    if (th != excluding && th is Pawn p && p.IsColonist) n++;
+                }
+            }
+            return n;
+        }
+
+        // One global cooldown so the per-tick fail condition doesn't spam the alert.
+        private static void Alert(ThingWithComps shuttle, string text)
+        {
+            if (Current.ProgramState != ProgramState.Playing) return;
+            int now = Find.TickManager.TicksGame;
+            if (now - lastMsgTick > 90)
+            {
+                lastMsgTick = now;
+                Messages.Message(text, shuttle, MessageTypeDefOf.RejectInput, historical: false);
+            }
+        }
+    }
+}

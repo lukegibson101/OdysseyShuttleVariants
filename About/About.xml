@@ -16,8 +16,14 @@ Portions of the materials used to create this content/mod are trademarks and/or 
       <packageId>Ludeon.RimWorld.Odyssey</packageId>
       <displayName>Odyssey</displayName>
     </li>
+    <li>
+      <packageId>brrainz.harmony</packageId>
+      <displayName>Harmony</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+    </li>
   </modDependencies>
   <loadAfter>
+    <li>brrainz.harmony</li>
     <li>Ludeon.RimWorld</li>
     <li>Ludeon.RimWorld.Royalty</li>
     <li>Ludeon.RimWorld.Biotech</li>

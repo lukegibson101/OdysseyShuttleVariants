@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+  <!-- Bring the vanilla Odyssey passenger shuttle into our typed-capacity system so it's consistent
+       with the fleet. SAFE: every quest/permit that sends a shuttle spawns ThingDefOf.Shuttle (the
+       Core imperial shuttle), never PassengerShuttle - so PassengerShuttle is player-built only and
+       capping it can't break quest pickups.
+       Inserted right AFTER CompProperties_Shuttle (not appended) so (a) it runs after CompShuttle in
+       PostSpawnSetup and (b) its inspect line sits in the same spot as on our own craft (near the
+       top, before the mass/fuel lines) instead of at the bottom. -->
+  <Operation Class="PatchOperationInsert">
+    <xpath>/Defs/ThingDef[defName="PassengerShuttle"]/comps/li[@Class="CompProperties_Shuttle"]</xpath>
+    <order>Append</order>
+    <value>
+      <li Class="OdysseyShuttleVariants.CompProperties_TypedShuttleCapacity">
+        <maxColonists>6</maxColonists>
+      </li>
+    </value>
+  </Operation>
+
+</Patch>

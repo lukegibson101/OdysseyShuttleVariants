@@ -36,6 +36,12 @@
       <li Class="CompProperties_Shuttle">
         <shipDef>Ship_OSV_MechShuttle</shipDef>
       </li>
+      <li Class="OdysseyShuttleVariants.CompProperties_TypedShuttleCapacity">
+        <maxColonists>1</maxColonists>
+        <!-- bandwidth budget + mechanitor-only are enforced in the next build; data captured now. -->
+        <mechBandwidthCapacity>6</mechBandwidthCapacity>
+        <requireMechanitor>true</requireMechanitor>
+      </li>
       <li Class="CompProperties_Launchable">
         <fuelPerTile>3.3</fuelPerTile>
         <minFuelCost>55</minFuelCost>

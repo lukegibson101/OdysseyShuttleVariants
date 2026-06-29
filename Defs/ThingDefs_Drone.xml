@@ -34,6 +34,9 @@
       <li Class="CompProperties_Shuttle">
         <shipDef>Ship_OSV_DroneShuttle</shipDef>
       </li>
+      <li Class="OdysseyShuttleVariants.CompProperties_TypedShuttleCapacity">
+        <noPawns>true</noPawns>
+      </li>
       <li Class="CompProperties_Launchable">
         <fuelPerTile>1.5</fuelPerTile>
         <minFuelCost>30</minFuelCost>
