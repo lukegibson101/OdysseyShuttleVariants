@@ -111,8 +111,7 @@
       <li>MultiAnalyzer</li>
     </requiredResearchFacilities>
     <prerequisites>
-      <li>TransportPod</li>
-      <li>MultiAnalyzer</li>
+      <li>Shuttles</li>
       <li>StandardMechtech</li>
     </prerequisites>
     <tab>OSV_ShuttlesTab</tab>

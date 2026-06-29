@@ -109,11 +109,13 @@
       <li>MultiAnalyzer</li>
     </requiredResearchFacilities>
     <prerequisites>
-      <li>OSV_CargoShuttleTech</li>
+      <!-- Drone hangs off the Mech shuttle (autonomous flight builds on mech control tech).
+           Mech is Biotech-only, so this makes the Drone require Biotech too - intended. -->
+      <li>OSV_MechShuttleTech</li>
     </prerequisites>
     <tab>OSV_ShuttlesTab</tab>
-    <researchViewX>4.5</researchViewX>
-    <researchViewY>1.0</researchViewY>
+    <researchViewX>3.0</researchViewX>
+    <researchViewY>2.5</researchViewY>
   </ResearchProjectDef>
 
 </Defs>

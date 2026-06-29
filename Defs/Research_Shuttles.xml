@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <!-- Unlock chain: TransportPod + MultiAnalyzer -> Troop -> Cargo -> Drone. Mech branches off
-       TransportPod + StandardMechtech (parallel; in the Biotech file). Per-shuttle capacity-UPGRADE
-       projects (cargo / fuel eff / range / crew-mech cap) are a later C# phase (stats read research). -->
+  <!-- Unlock tree, rooted on vanilla Odyssey "Shuttles" (Odyssey is a hard mod requirement):
+         Shuttles -> Troop -> Cargo -> Heavy
+         Shuttles + StandardMechtech -> Mech -> Drone   (Biotech branch; Mech+Drone need Biotech)
+       Per-shuttle capacity-UPGRADE projects (cargo / fuel eff / range / crew-mech cap) are a later
+       C# phase (stats read research). Troop research is below; Heavy is below; Cargo is below;
+       Drone lives in ThingDefs_Drone.xml, Mech in Biotech/ThingDefs_MechShuttle.xml. -->
 
   <ResearchProjectDef>
     <defName>OSV_CargoShuttleTech</defName>
@@ -52,8 +55,7 @@
       <li>MultiAnalyzer</li>
     </requiredResearchFacilities>
     <prerequisites>
-      <li>TransportPod</li>
-      <li>MultiAnalyzer</li>
+      <li>Shuttles</li>
     </prerequisites>
     <tab>OSV_ShuttlesTab</tab>
     <researchViewX>0.5</researchViewX>
