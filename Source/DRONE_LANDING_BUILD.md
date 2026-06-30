@@ -1,7 +1,11 @@
 # Build plan — Transport Drone "land & hold cargo" (drone autonomy)
 
-Status: **NOT STARTED** — designed + scoped 2026-06-30, deferred to its own session.
-This is the biggest single C# piece in the mod. Read this whole doc before writing code.
+Status: **DONE + VERIFIED IN-GAME 2026-06-30 (Approach A).** Land-and-hold, standard Launch (stay on
+world map), gift-to-settlement (keeps drone), Form camp (persistent custom MapParent), re-launch from
+camp, jump-to-location, settlement icon-z — all confirmed working by Luke. Remaining: MP sync pass
+(singleplayer-only until then) + optional polish. See "BUILT" section at the bottom for the final design.
+
+This was the biggest single C# piece in the mod. The original plan + spike + decision are below.
 
 ## The spec (Luke, 2026-06-30)
 The drone must **behave exactly like a normal shuttle that has a colonist aboard**:
@@ -146,3 +150,79 @@ incident suppression is clean, ship B. Else fall back to A.
 - Fuel: does a landed drone need fuel to re-launch, and can it strand if it can't afford the trip
   (the old "fuel-gated auto-return / strand & rescue" idea)? v1 could ignore fuel.
 - Recall target: nearest colony auto, or player-chosen?
+
+---
+
+## SPIKE RESULT (2026-06-30) — Approach B (ghost pilot) REJECTED, A chosen
+
+Decompile spike (no prototype needed — the code was conclusive):
+- **B's reuse really exists:** a caravan DOES form on an empty tile and the **shuttle + cargo survive**
+  (`TransportersArrivalAction_FormCaravan.Arrived` lines 55-58 `RemoveShuttle()` → `GiveThing(caravan)`),
+  and vanilla has a full caravan-shuttle re-launch system (`CaravanShuttleUtility.LaunchShuttle`).
+- **But the ghost pawn CANNOT be hidden/inert:** `IsOwner` (CaravanUtility.cs:9) ≈ `IsColonist`
+  (Pawn.cs:518) — same predicate, so any pawn that triggers caravan formation also shows on the
+  colonist bar (`ColonistBar.cs:276-280` filters caravan pawns only by `IsColonist`). A caravan can't
+  be pawnless (inventory is stored on pawns; `Caravan.Notify_MemberDied` ~1049 destroys it + abandons
+  cargo with no owner). And `Caravan_NeedsTracker` ticks food/rest → the "inert" pawn starves/alerts.
+  Suppressing all of that (bar + 6 WITab_Caravan_* + needs + incidents + selection) = huge fragile
+  MP-risky surface. **B is not viable cleanly.**
+- => **Approach A.** Decisions (Luke 2026-06-30): pivot to A; form-camp **decide later**; fuel
+  **gated + strand**.
+
+## BUILT (2026-06-30, Approach A) — files + what works
+
+New files (Source/): `WorldObject_LandedDrone.cs`, `TransportersArrivalAction_DroneLand.cs`;
+patch added to `HarmonyPatches.cs`; def `OSV_LandedDrone` in `Defs/Shuttles_Common.xml`.
+
+- **`WorldObject_LandedDrone : WorldObject, IThingHolder`** — holds ONE `ActiveTransporterInfo`
+  (the shuttle Thing + cargo, reused verbatim from flight — the shuttle is already `SetShuttle`'d).
+  `Scribe_Deep` round-trips it; `GetChildHolders` exposes the container. Lives on the world map →
+  survives abandoning the origin colony map. Inspect string shows fuel + cargo count. Gizmos:
+  - **Launch** (REWORKED 2026-06-30 per Luke — replaced the old bespoke "Recall home"/"Send to tile"
+    with the *standard* shuttle launch, same as a caravan-borne cargo ship): the command calls
+    `shuttle.LaunchableComp.StartChoosingDestination(LaunchTo)` so it gets the **fuel-range ring**,
+    the full **destination float-menu** (land at colony, visit settlement, + our injected "Land drone
+    here" on empty tiles), and proper camera. `EnsureLaunchReady` guards `groupID >= 0` first.
+    `LaunchTo` is the launch action (mirrors `CaravanShuttleUtility.LaunchShuttle`): fuel/range check →
+    **strand** (stay landed + msg) if it can't afford the trip; else consume fuel, build
+    `TravellingTransporters`, `AddTransporter`, `Destroy()` self, then **jump camera to nearest colony**
+    (Luke's fix — don't linger on the world map).
+  - **Form camp** (ADDED 2026-06-30 per Luke "do everything a normal shuttle can, incl make camp"):
+    mirrors `SettleInEmptyTileUtility.SetupCamp` — `GetOrGenerateMapUtility.GetOrGenerateMap(tile,
+    WorldObjectDefOf.Camp)` → `TransportersArrivalActionUtility.DropShuttle(info, map, map.Center)`
+    (respawns the ship building + dumps cargo on the camp map) → `TimedDetectionRaids` clock →
+    Destroy self → jump to the ship. The ship is then a normal re-launchable building on a real map
+    (also makes it visible/jumpable on a map). Disabled if `!CanCreateMapAt` / `AnyMapParentAt`.
+- **`TransportersArrivalAction_DroneLand : TransportersArrivalAction`** — `GeneratesMap=false`;
+  `Arrived` creates the landed-drone world object at the tile and moves the transporter into it.
+- **`Patch_CompLaunchable_FloatMenu`** (postfix on private `CompLaunchable.GetTransportersFloatMenuOptionsAt`)
+  — for our `noPawns` drone only, on an **empty passable tile** (`!Impassable && !AnyWorldObjectAt`)
+  replaces vanilla's "contents will be lost" with **"Land drone here (hold cargo)"** →
+  `launchAction(tile, new TransportersArrivalAction_DroneLand())`. Single-option result auto-invokes,
+  so clicking an empty tile lands the drone immediately. Other shuttles/quest shuttles untouched.
+- **`LaunchTo(tile, action)`** (shared by recall + send) mirrors `CaravanShuttleUtility.LaunchShuttle`:
+  `CanLaunch` (enforces cooldown) + distance-vs-`MaxLaunchDistanceAtFuelLevel` → **strands** (stays
+  landed + message) if it can't afford the trip; else `ConsumeFuel`, build `TravellingTransporters`
+  (the drone's `OSV_TravelingShuttle` def), `AddTransporter`, add to world, `Destroy()` self.
+
+Build: `cd Source && dotnet build -c Release` (clean, 0 warn). DLL → Assemblies/. Deployed (copy,
+NOT junction) to `D:\...\RimWorld\Mods\OdysseyShuttleVariants` — redeploy after every C# change.
+
+## IN-GAME TEST PLAN (do after a full restart — Luke)
+1. Build a drone, load cargo, launch → click an **empty wilderness tile** → expect "Land drone here",
+   drone lands as a world object, cargo intact, "has landed" message (NOT "contents lost").
+2. Select the landed drone → **Recall home** → flies to nearest colony, shuttle re-materializes on the
+   map with cargo.
+3. **Send to tile** → world targeter; empty tile re-lands as drone; own colony lands there; reject else.
+4. **Save/load** with a landed drone → persists with cargo + fuel.
+5. **Abandon the origin colony map** while a drone is landed elsewhere → drone unaffected.
+6. **Strand:** drain fuel low, try recall to a far colony → "not enough fuel … remains landed".
+
+## STILL TODO (next increments)
+- **MP sync** (task): uncomment `RimWorld.MultiplayerAPI` in csproj; `RegisterSyncMethod` on the
+  gizmo actions (`RecallHome`, the `ChoseTarget`→`LaunchTo` path) — world-object commands need sync.
+- **Form-camp** gizmo (deferred per Luke): generate/enter a map to unload/settle.
+- **Fuel rescue — RESOLVED (Luke 2026-06-30): Form camp IS the rescue.** A stranded drone can always
+  Form camp (no fuel needed) → the ship lands as a normal building you refuel with chemfuel → re-launch.
+  No separate rescue mechanism. The strand message now points the player at Form camp.
+- Cosmetic: dedicated world-map texture/expanding icon (currently reuses Caravan / PassengerShuttle).

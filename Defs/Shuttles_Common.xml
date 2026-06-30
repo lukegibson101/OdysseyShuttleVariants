@@ -12,4 +12,57 @@
     <expandingIconDrawSize>1</expandingIconDrawSize>
   </WorldObjectDef>
 
+  <!-- Persistent "landed drone" world object: where the autonomous drone parks when it lands on a
+       tile with no map, holding its shuttle + cargo. Lives on the world map so it survives the origin
+       colony map being abandoned. See WorldObject_LandedDrone / TransportersArrivalAction_DroneLand. -->
+  <WorldObjectDef>
+    <defName>OSV_LandedDrone</defName>
+    <label>landed transport drone</label>
+    <description>A transport drone parked on the surface, holding its cargo until it is recalled to a colony or sent onward.</description>
+    <worldObjectClass>OdysseyShuttleVariants.WorldObject_LandedDrone</worldObjectClass>
+    <texture>World/WorldObjects/Caravan</texture>
+    <useDynamicDrawer>true</useDynamicDrawer>
+    <expandingIcon>true</expandingIcon>
+    <expandingIconTexture>World/WorldObjects/Expanding/PassengerShuttle</expandingIconTexture>
+    <!-- 100 = same as Caravan, so a drone parked over a settlement draws ABOVE it (like a visiting caravan). -->
+    <expandingIconPriority>100</expandingIconPriority>
+    <expandMore>true</expandMore>
+    <expandingIconColor>(162,164,149)</expandingIconColor>
+    <expandingIconDrawSize>1</expandingIconDrawSize>
+    <selectable>true</selectable>
+    <canHaveFaction>true</canHaveFaction>
+    <!-- Must stay true: SettleInEmptyTileUtility.CanCreateMapAt returns false if ANY world object at
+         the tile has canHaveMap=false, which would disable the Form camp gizmo ("Cannot camp here"). -->
+    <canHaveMap>true</canHaveMap>
+    <!-- Close-up (zoomed-in) world draw orders by DrawAltitude(0.03) + Rand(0..0.01) + this offset.
+         Settlements sit at ~0.03-0.04; +0.02 -> ~0.05-0.06 so a drone parked over a settlement draws
+         clearly ABOVE it (caravans use DrawAltitude 0.035 for the same reason). -->
+    <drawAltitudeOffset>0.02</drawAltitudeOffset>
+  </WorldObjectDef>
+
+  <!-- The map the drone forms a camp on. Custom MapParent (WorldObject_DroneCamp) that persists while the
+       ship is parked, instead of vanilla Camp (which deletes pawnless maps and would lose the ship). -->
+  <WorldObjectDef>
+    <defName>OSV_DroneCamp</defName>
+    <label>drone landing site</label>
+    <description>A transport drone has set down here. Its ship sits on the surface; you can send colonists to unload it, and it can launch again on its own.</description>
+    <worldObjectClass>OdysseyShuttleVariants.WorldObject_DroneCamp</worldObjectClass>
+    <texture>World/WorldObjects/Camp</texture>
+    <useDynamicDrawer>true</useDynamicDrawer>
+    <expandingIcon>true</expandingIcon>
+    <expandingIconTexture>World/WorldObjects/Expanding/PassengerShuttle</expandingIconTexture>
+    <expandingIconPriority>100</expandingIconPriority>
+    <expandMore>true</expandMore>
+    <expandingIconColor>(162,164,149)</expandingIconColor>
+    <expandingIconDrawSize>1</expandingIconDrawSize>
+    <selectable>true</selectable>
+    <canHaveFaction>true</canHaveFaction>
+    <canHaveMap>true</canHaveMap>
+    <drawAltitudeOffset>0.02</drawAltitudeOffset>
+    <overrideMapSize>(150, 1, 150)</overrideMapSize>
+    <comps>
+      <li Class="WorldObjectCompProperties_FormCaravan" />
+    </comps>
+  </WorldObjectDef>
+
 </Defs>

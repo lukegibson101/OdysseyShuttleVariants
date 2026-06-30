@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using RimWorld;
+using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
@@ -359,6 +361,119 @@ namespace OdysseyShuttleVariants
                     }
                 }
             }
+        }
+    }
+
+    // The autonomous drone has no colonist, so vanilla's launch options either don't apply (a caravan
+    // can't form without a pawn owner; a settlement only offers crewed "visit") or would lose it (the
+    // "contents will be lost" fallback). For our no-pawn drone we therefore curate the destination menu
+    // so it can NEVER lose its cargo: strip the loss option, offer "gift cargo" at friendly settlements
+    // (keeping the drone), and "land & hold" on any mapless passable tile. Own-colony / map tiles keep
+    // their normal vanilla land options.
+    [HarmonyPatch(typeof(CompLaunchable), "GetTransportersFloatMenuOptionsAt")]
+    public static class Patch_CompLaunchable_FloatMenu
+    {
+        public static void Postfix(CompLaunchable __instance, PlanetTile tile,
+            Action<PlanetTile, TransportersArrivalAction> launchAction, ref IEnumerable<FloatMenuOption> __result)
+        {
+            CompTypedShuttleCapacity comp = __instance.parent.TryGetComp<CompTypedShuttleCapacity>();
+            if (comp == null || !comp.Props.noPawns) return;
+
+            List<FloatMenuOption> opts = (__result != null)
+                ? new List<FloatMenuOption>(__result)
+                : new List<FloatMenuOption>();
+
+            // The drone never loses its cargo: drop vanilla's "contents will be lost" option.
+            string lossLabel = "TransportPodsContentsWillBeLost".Translate();
+            opts.RemoveAll(o => o.Label == lossLabel);
+
+            Settlement settlement = Find.WorldObjects.WorldObjectAt<Settlement>(tile);
+            if (settlement != null && settlement.Faction != null && !settlement.Faction.IsPlayer
+                && !settlement.Faction.HostileTo(Faction.OfPlayer))
+            {
+                // Gift cargo to the settlement faction (goodwill), drone holds at the tile afterward.
+                opts.Add(new FloatMenuOption("Gift cargo to " + settlement.Label, delegate
+                {
+                    launchAction(tile, new TransportersArrivalAction_DroneGift(settlement));
+                }));
+            }
+            else if (!Find.World.Impassable(tile) && !Find.WorldObjects.AnyMapParentAt(tile)
+                && !Find.WorldObjects.AnyWorldObjectAt<WorldObject_LandedDrone>(tile))
+            {
+                // Mapless passable tile (incl. empty wilderness): land & hold the cargo.
+                opts.Add(new FloatMenuOption("Land drone here (hold cargo)", delegate
+                {
+                    launchAction(tile, new TransportersArrivalAction_DroneLand());
+                }));
+            }
+
+            __result = opts;
+        }
+    }
+
+    // Add landed transport drones to the world map's "Jump to location..." menu, which vanilla only
+    // populates with player maps, quest objects, and caravans (our drone is a bespoke world object, so
+    // it's otherwise missing). A camped drone is a Map and already appears via the maps loop. We can't
+    // append to the list the vanilla action builds in its own closure, so we replace the action with a
+    // faithful copy of WorldGizmoUtility.GetJumpToGizmo plus our landed drones.
+    [HarmonyPatch(typeof(WorldGizmoUtility), "GetJumpToGizmo")]
+    public static class Patch_WorldGizmoUtility_JumpTo
+    {
+        public static void Postfix(ref Gizmo __result)
+        {
+            if (__result is Command_Action cmd) cmd.action = BuildMenu;
+        }
+
+        private static void BuildMenu()
+        {
+            List<FloatMenuOption> list = new List<FloatMenuOption>();
+            HashSet<WorldObject> seen = new HashSet<WorldObject>();
+
+            foreach (Map m in Find.Maps)
+            {
+                if (m.IsPocketMap || seen.Contains(m.Parent)) continue;
+                string text = m.Parent.LabelCap;
+                if (GravshipUtility.TryGetNameOfGravshipOnMap(m, out string name)) text = text + " (" + name + ")";
+                MapParent parentLocal = m.Parent;
+                list.Add(new FloatMenuOption(text, delegate { CameraJumper.TryJumpAndSelect(parentLocal); },
+                    parentLocal.ExpandingIcon, parentLocal.ExpandingIconColor));
+                seen.Add(parentLocal);
+            }
+            foreach (Quest quest in Find.QuestManager.questsInDisplayOrder)
+            {
+                foreach (QuestPart part in quest.PartsListForReading)
+                {
+                    if (part is QuestPart_SpawnWorldObject sp && sp.worldObject != null
+                        && !sp.worldObject.Destroyed && sp.worldObject.Spawned && !seen.Contains(sp.worldObject))
+                    {
+                        WorldObject woLocal = sp.worldObject;
+                        list.Add(new FloatMenuOption(woLocal.LabelCap, delegate { CameraJumper.TryJumpAndSelect(woLocal); },
+                            woLocal.ExpandingIcon, woLocal.ExpandingIconColor));
+                        seen.Add(woLocal);
+                    }
+                }
+            }
+            foreach (Caravan caravan in Find.WorldObjects.Caravans)
+            {
+                if (seen.Contains(caravan)) continue;
+                Caravan caravanLocal = caravan;
+                list.Add(new FloatMenuOption(caravanLocal.LabelCap, delegate { CameraJumper.TryJumpAndSelect(caravanLocal); },
+                    caravanLocal.ExpandingIcon, caravanLocal.ExpandingIconColor));
+                seen.Add(caravanLocal);
+            }
+            // Our addition: landed transport drones (world-map objects with no map of their own).
+            foreach (WorldObject wo in Find.WorldObjects.AllWorldObjects)
+            {
+                if (wo is WorldObject_LandedDrone && !seen.Contains(wo))
+                {
+                    WorldObject woLocal = wo;
+                    list.Add(new FloatMenuOption(woLocal.LabelCap, delegate { CameraJumper.TryJumpAndSelect(woLocal); },
+                        woLocal.ExpandingIcon, woLocal.ExpandingIconColor));
+                    seen.Add(woLocal);
+                }
+            }
+            if (list.Count == 0) list.Add(new FloatMenuOption("NothingToJumpTo".Translate(), null));
+            Find.WindowStack.Add(new FloatMenu(list));
         }
     }
 }
