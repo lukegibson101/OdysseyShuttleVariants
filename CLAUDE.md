@@ -78,4 +78,4 @@ Remaining:
 
 ## Related (separate future mod)
 - **Crew & Loadout Presets** — named groups of pawns (colonists/animals/mechs, + optional payload) applied
-  across the vanilla selection dialogs. Standalone (no Odyssey dep). Design: `../CrewLoadoutPresets-DESIGN.md`.
+  across the vanilla selection dialogs. Standalone (no Odyssey dep). Design: `../ModIdeas/CrewLoadoutPresets-DESIGN.md`.
