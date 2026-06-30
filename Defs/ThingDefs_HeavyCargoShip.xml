@@ -12,28 +12,24 @@
     <label>heavy cargo ship</label>
     <description>A massive four-engine cargo lifter built for moving freight by the tonne. Its cavernous hold dwarfs a standard cargo shuttle, but it is slow to cycle, drinks fuel, and cannot range as far.</description>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
-    <size>(10,6)</size>
-    <rotatable>false</rotatable>
-    <!-- base is defaultPlacingRot=East (tall shuttles); this craft's art is a WIDE profile, so
-         place it North = no 90° rotation, art draws wide as drawn. East-only single-frame placeholder. -->
-    <defaultPlacingRot>North</defaultPlacingRot>
-    <!-- base interactionCellOffset (2,0,0) suits the tall shuttles; this wide ship's cargo ramp is at
-         the bottom-centre, so put the boarding cell just south of centre, in front of the doors.
-         At 10x6 the south edge is z=-2, so (0,0,-3) sits right against the hull. -->
-    <interactionCellOffset>(0,0,-3)</interactionCellOffset>
+    <!-- North-default orientation (nose up) is portrait, so the footprint is 6 wide x 10 deep;
+         rotating to east gives the 10x6 wide pad. Now fully rotatable like the rest of the fleet. -->
+    <size>(6,10)</size>
+    <!-- Side boarding, matching the fleet (Troop/Cargo board off the east flank). Calibrated off
+         Cargo: size (4,6) -> (3,0,0); so size (6,10) -> east edge x=3, adjacent cell x=4. -->
+    <interactionCellOffset>(4,0,0)</interactionCellOffset>
     <statBases>
       <MaxHitPoints>1100</MaxHitPoints>
       <WorkToBuild>60000</WorkToBuild>
     </statBases>
     <graphicData>
-      <graphicClass>Graphic_Single</graphicClass>
+      <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <!-- sized to fill the 10x6 footprint snugly so the selection box hugs the hull (vanilla-style):
-           width fills 10, depth 5.8 sits just inside 6. -->
-      <drawSize>(10, 5.8)</drawSize>
+      <!-- north orientation: 5.8 wide x 10 deep (swaps to 10x5.8 when facing east). -->
+      <drawSize>(5.8, 10)</drawSize>
       <shadowData>
-        <volume>(9.0, 1.0, 4.5)</volume>
+        <volume>(4.5, 1.0, 9.0)</volume>
       </shadowData>
     </graphicData>
     <uiIconScale>0.85</uiIconScale>
@@ -89,23 +85,21 @@
   <ThingDef ParentName="OSV_ShuttleIncomingBase">
     <defName>OSV_HeavyCargoShipIncoming</defName>
     <label>heavy cargo ship (incoming)</label>
-    <rotatable>false</rotatable>
     <graphicData>
-      <graphicClass>Graphic_Single</graphicClass>
+      <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(10, 5.8)</drawSize>
+      <drawSize>(5.8, 10)</drawSize>
     </graphicData>
   </ThingDef>
   <ThingDef ParentName="OSV_ShuttleLeavingBase">
     <defName>OSV_HeavyCargoShipLeaving</defName>
     <label>heavy cargo ship (leaving)</label>
-    <rotatable>false</rotatable>
     <graphicData>
-      <graphicClass>Graphic_Single</graphicClass>
+      <graphicClass>Graphic_Multi</graphicClass>
       <texPath>Things/Building/OSV/HeavyCargoShip/HeavyCargoShip</texPath>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(10, 5.8)</drawSize>
+      <drawSize>(5.8, 10)</drawSize>
     </graphicData>
   </ThingDef>
 
