@@ -60,6 +60,24 @@ namespace OdysseyShuttleVariants
             }
             return n;
         }
+
+        // Total bandwidth cost of the mechs currently ticked to load.
+        public static float SelectedMechBandwidth(Dialog_LoadTransporters dlg)
+        {
+            float total = 0f;
+            List<TransferableOneWay> list = Transferables(dlg);
+            if (list != null)
+            {
+                foreach (TransferableOneWay tr in list)
+                {
+                    if (tr.CountToTransfer > 0 && tr.AnyThing is Pawn p && p.RaceProps.IsMechanoid)
+                    {
+                        total += p.GetStatValue(StatDefOf.BandwidthCost) * tr.CountToTransfer;
+                    }
+                }
+            }
+            return total;
+        }
     }
 
     // Live passenger readout in the load dialog header (top-left), red when over the cap.
@@ -71,32 +89,40 @@ namespace OdysseyShuttleVariants
             CompTypedShuttleCapacity comp = DialogAccess.GetComp(__instance);
             if (comp == null) return;
 
-            string label;
-            bool over;
+            Color oldColor = GUI.color;
+            TextAnchor oldAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.UpperLeft;
+            float y = 6f;
+
             if (comp.Props.noPawns)
             {
                 int pawns = DialogAccess.SelectedPawns(__instance);
-                over = pawns > 0;
-                label = over ? "No crew allowed (cargo only)" : "Autonomous: cargo only";
+                bool over = pawns > 0;
+                DrawLine(ref y, over, over ? "No crew allowed (cargo only)" : "Autonomous: cargo only");
             }
             else if (comp.Props.maxColonists >= 0)
             {
                 int n = DialogAccess.SelectedColonists(__instance);
-                over = n > comp.Props.maxColonists;
-                label = "Passengers: " + n + " / " + comp.Props.maxColonists;
-            }
-            else
-            {
-                return;
+                string lbl = comp.Props.requireMechanitor ? "Mechanitor: " : "Passengers: ";
+                DrawLine(ref y, n > comp.Props.maxColonists, lbl + n + " / " + comp.Props.maxColonists);
             }
 
-            Color oldColor = GUI.color;
-            TextAnchor oldAnchor = Text.Anchor;
-            GUI.color = over ? ColorLibrary.RedReadable : Color.white;
-            Text.Anchor = TextAnchor.UpperLeft;
-            Widgets.Label(new Rect(12f, 6f, 320f, 25f), label);
+            if (comp.Props.mechBandwidthCapacity > 0)
+            {
+                int used = Mathf.RoundToInt(DialogAccess.SelectedMechBandwidth(__instance));
+                DrawLine(ref y, used > comp.Props.mechBandwidthCapacity,
+                    "Mechs: " + used + " / " + comp.Props.mechBandwidthCapacity + " bandwidth");
+            }
+
             GUI.color = oldColor;
             Text.Anchor = oldAnchor;
+        }
+
+        private static void DrawLine(ref float y, bool over, string text)
+        {
+            GUI.color = over ? ColorLibrary.RedReadable : Color.white;
+            Widgets.Label(new Rect(12f, y, 360f, 25f), text);
+            y += 22f;
         }
     }
 
@@ -149,6 +175,21 @@ namespace OdysseyShuttleVariants
                     __result = false;
                 }
             }
+
+            if (comp.Props.mechBandwidthCapacity > 0 && pawns != null)
+            {
+                float used = 0f;
+                foreach (Pawn p in pawns)
+                {
+                    if (p.RaceProps.IsMechanoid) used += p.GetStatValue(StatDefOf.BandwidthCost);
+                }
+                if (used > comp.Props.mechBandwidthCapacity)
+                {
+                    Messages.Message("This shuttle's mech bay holds at most " + comp.Props.mechBandwidthCapacity
+                        + " bandwidth of mechs.", MessageTypeDefOf.RejectInput, historical: false);
+                    __result = false;
+                }
+            }
         }
     }
 
@@ -171,11 +212,23 @@ namespace OdysseyShuttleVariants
             CompTypedShuttleCapacity comp = __instance.parent.TryGetComp<CompTypedShuttleCapacity>();
             if (comp == null || !(t is Pawn pawn)) return;
 
+            // Drone: no pawns of any kind.
             if (comp.Props.noPawns)
             {
                 __result = false;
+                return;
             }
-            else if (comp.Props.requireMechanitor && pawn.IsColonist && pawn.mechanitor == null)
+
+            // Mechs may only board a craft that has a mech bay (mechBandwidthCapacity > 0). The
+            // budget itself is enforced on the enter-job; here we just keep them off non-mech craft.
+            if (pawn.RaceProps.IsMechanoid)
+            {
+                if (comp.Props.mechBandwidthCapacity <= 0) __result = false;
+                return;
+            }
+
+            // Mech ship: a colonist passenger must be a mechanitor.
+            if (comp.Props.requireMechanitor && pawn.IsColonist && pawn.mechanitor == null)
             {
                 __result = false;
             }
@@ -196,16 +249,34 @@ namespace OdysseyShuttleVariants
             if (shuttle == null) return;
             ThingWithComps parent = shuttle.parent;
             CompTypedShuttleCapacity comp = parent.TryGetComp<CompTypedShuttleCapacity>();
-            if (comp == null || comp.Props.noPawns || comp.Props.maxColonists < 0) return;
+            if (comp == null || comp.Props.noPawns) return;
 
             Pawn pawn = __instance.pawn;
-            __instance.AddFailCondition(delegate
+
+            // Colonist seat cap.
+            if (comp.Props.maxColonists >= 0)
             {
-                if (pawn == null || !pawn.IsColonist) return false;
-                if (ColonistsAboard(parent, pawn) < comp.Props.maxColonists) return false;
-                Alert(parent, parent.LabelShortCap + " is at maximum occupancy (" + comp.Props.maxColonists + " passengers).");
-                return true;
-            });
+                __instance.AddFailCondition(delegate
+                {
+                    if (pawn == null || !pawn.IsColonist) return false;
+                    if (ColonistsAboard(parent, pawn) < comp.Props.maxColonists) return false;
+                    Alert(parent, parent.LabelShortCap + " is at maximum occupancy (" + comp.Props.maxColonists + " passengers).");
+                    return true;
+                });
+            }
+
+            // Mech bay bandwidth budget.
+            if (comp.Props.mechBandwidthCapacity > 0)
+            {
+                __instance.AddFailCondition(delegate
+                {
+                    if (pawn == null || !pawn.RaceProps.IsMechanoid) return false;
+                    float cost = pawn.GetStatValue(StatDefOf.BandwidthCost);
+                    if (MechBandwidthAboard(parent, pawn) + cost <= comp.Props.mechBandwidthCapacity) return false;
+                    Alert(parent, parent.LabelShortCap + " mech bay is full (" + comp.Props.mechBandwidthCapacity + " bandwidth).");
+                    return true;
+                });
+            }
         }
 
         private static int ColonistsAboard(ThingWithComps shuttle, Pawn excluding)
@@ -222,6 +293,23 @@ namespace OdysseyShuttleVariants
             return n;
         }
 
+        private static float MechBandwidthAboard(ThingWithComps shuttle, Pawn excluding)
+        {
+            float total = 0f;
+            CompTransporter transporter = shuttle.TryGetComp<CompTransporter>();
+            if (transporter != null)
+            {
+                foreach (Thing th in transporter.innerContainer)
+                {
+                    if (th != excluding && th is Pawn p && p.RaceProps.IsMechanoid)
+                    {
+                        total += p.GetStatValue(StatDefOf.BandwidthCost);
+                    }
+                }
+            }
+            return total;
+        }
+
         // One global cooldown so the per-tick fail condition doesn't spam the alert.
         private static void Alert(ThingWithComps shuttle, string text)
         {
@@ -231,6 +319,45 @@ namespace OdysseyShuttleVariants
             {
                 lastMsgTick = now;
                 Messages.Message(text, shuttle, MessageTypeDefOf.RejectInput, historical: false);
+            }
+        }
+    }
+
+    // Vanilla shuttles refuse to launch without a free colonist of PilotingAbility > 0.1. Two of ours
+    // legitimately have no such pilot: the autonomous drone (no crew at all) and the mech ship (its
+    // mechanitor interfaces with the ship systems rather than flying it by skill).
+    [HarmonyPatch(typeof(CompShuttle), "HasPilot", MethodType.Getter)]
+    public static class Patch_CompShuttle_HasPilot
+    {
+        public static void Postfix(CompShuttle __instance, ref bool __result)
+        {
+            if (__result) return;
+            CompTypedShuttleCapacity comp = __instance.parent.TryGetComp<CompTypedShuttleCapacity>();
+            if (comp == null) return;
+
+            // Autonomous drone: flies itself, no pilot needed.
+            if (comp.Props.noPawns)
+            {
+                __result = true;
+                return;
+            }
+
+            // Mech ship: a mechanitor aboard counts as the pilot (it still won't launch empty,
+            // which is intended - the mech ship needs its mechanitor).
+            if (comp.Props.requireMechanitor)
+            {
+                CompTransporter transporter = __instance.parent.TryGetComp<CompTransporter>();
+                if (transporter != null)
+                {
+                    foreach (Thing th in transporter.innerContainer)
+                    {
+                        if (th is Pawn p && p.mechanitor != null)
+                        {
+                            __result = true;
+                            return;
+                        }
+                    }
+                }
             }
         }
     }

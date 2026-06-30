@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace OdysseyShuttleVariants
@@ -36,25 +37,50 @@ namespace OdysseyShuttleVariants
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
             base.PostSpawnSetup(respawningAfterLoad);
+
             // Caps are scribed by CompShuttle, so we only set them once, on first spawn. This comp
             // is only ever on our own buildable craft (never quest shuttles), so no faction guard.
-            if (respawningAfterLoad) return;
-
-            CompShuttle shuttle = parent.TryGetComp<CompShuttle>();
-            if (shuttle == null) return;
-
-            // Runs after CompShuttle.PostSpawnSetup (listed after CompProperties_Shuttle in the def),
-            // which force-sets accept* true for player shuttles - so our values win.
-            if (Props.noPawns)
+            if (!respawningAfterLoad)
             {
-                shuttle.acceptColonists = false;
-                shuttle.acceptChildren = false;
-                shuttle.acceptColonyPrisoners = false;
-                shuttle.allowSlaves = false;
+                CompShuttle shuttle = parent.TryGetComp<CompShuttle>();
+                if (shuttle != null)
+                {
+                    // Runs after CompShuttle.PostSpawnSetup (listed after CompProperties_Shuttle in
+                    // the def), which force-sets accept* true for player shuttles - so our values win.
+                    if (Props.noPawns)
+                    {
+                        shuttle.acceptColonists = false;
+                        shuttle.acceptChildren = false;
+                        shuttle.acceptColonyPrisoners = false;
+                        shuttle.allowSlaves = false;
+                    }
+                    else if (Props.maxColonists >= 1)
+                    {
+                        shuttle.maxColonistCount = Props.maxColonists;
+                    }
+                }
             }
-            else if (Props.maxColonists >= 1)
+
+            EnsureLaunchReady();
+        }
+
+        public override void CompTickRare()
+        {
+            base.CompTickRare();
+            EnsureLaunchReady();
+        }
+
+        // The autonomous drone has no crew/cargo to "load", but vanilla blocks launch until a load
+        // group is initiated (groupID >= 0 -> LoadingInProgressOrReadyToLaunch). Keep an empty group
+        // assigned so the drone is always ready to take off, with or without cargo. (Self-heals if a
+        // load is cancelled.) InitiateLoading only assigns a groupID - it creates no hauling lord.
+        private void EnsureLaunchReady()
+        {
+            if (!Props.noPawns || !parent.Spawned) return;
+            CompTransporter transporter = parent.TryGetComp<CompTransporter>();
+            if (transporter != null && transporter.groupID < 0)
             {
-                shuttle.maxColonistCount = Props.maxColonists;
+                TransporterUtility.InitiateLoading(Gen.YieldSingle(transporter));
             }
         }
 
@@ -70,6 +96,20 @@ namespace OdysseyShuttleVariants
                 }
             }
             return n;
+        }
+
+        private int LoadedMechBandwidth()
+        {
+            float total = 0f;
+            CompTransporter transporter = parent.TryGetComp<CompTransporter>();
+            if (transporter != null)
+            {
+                foreach (Thing t in transporter.innerContainer)
+                {
+                    if (t is Pawn p && p.RaceProps.IsMechanoid) total += p.GetStatValue(StatDefOf.BandwidthCost);
+                }
+            }
+            return Mathf.RoundToInt(total);
         }
 
         public override string CompInspectStringExtra()
@@ -92,7 +132,7 @@ namespace OdysseyShuttleVariants
 
             if (Props.mechBandwidthCapacity > 0)
             {
-                lines.Add("Mech bandwidth: " + Props.mechBandwidthCapacity);
+                lines.Add("Mechs: " + LoadedMechBandwidth() + " / " + Props.mechBandwidthCapacity + " bandwidth");
             }
 
             return lines.Count > 0 ? string.Join("\n", lines.ToArray()) : null;
