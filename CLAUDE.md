@@ -76,6 +76,9 @@ Remaining:
    overlay. Reuse `Building_MechCharger` / `JobDriver_MechCharge` / `WorkGiver_HaulMechToCharger` /
    `JobGiver_GetEnergy_Charger` / `Need_MechEnergy`. Moderate C#, MP-deterministic.
 
-## Related (separate future mod)
-- **Crew & Loadout Presets** — named groups of pawns (colonists/animals/mechs, + optional payload) applied
-  across the vanilla selection dialogs. Standalone (no Odyssey dep). Design: `../ModIdeas/CrewLoadoutPresets-DESIGN.md`.
+## Related (separate future mods)
+- **Crew Presets** — named groups of pawns (colonists/animals/mechs) applied across the vanilla pawn-selection
+  dialogs (per-save). Design: `../ModIdeas/CrewPresets-DESIGN.md`.
+- **Transporter Loadouts** — named item manifests (e.g. 200 chemfuel + 100 meals) applied in cargo dialogs
+  (global/cross-save, since they're item-defs not pawns). Design: `../ModIdeas/TransporterLoadouts-DESIGN.md`.
+- Both standalone (no Odyssey dep); they pair if installed together.
