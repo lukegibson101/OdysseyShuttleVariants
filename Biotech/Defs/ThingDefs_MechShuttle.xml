@@ -8,7 +8,7 @@
   <ThingDef ParentName="OSV_ShuttleBase">
     <defName>OSV_MechShuttle</defName>
     <label>mechanitor shuttle</label>
-    <description>A heavy mechanitor transport built to haul mechs and their control gear between sites. High capacity, but its bulky systems make it the thirstiest of the shuttles.</description>
+    <description>A chemfuel shuttle given over to mech control gear and signal relays. Flown by a mechanitor, it ferries a warband of mechs between sites and carries little else.</description>
     <constructionSkillPrerequisite>7</constructionSkillPrerequisite>
     <statBases>
       <WorkToBuild>44000</WorkToBuild>

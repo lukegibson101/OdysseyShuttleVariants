@@ -20,6 +20,10 @@
     <canOverlapZones>true</canOverlapZones>
     <terrainAffordanceNeeded>Light</terrainAffordanceNeeded>
     <drawerType>RealtimeOnly</drawerType>
+    <!-- Enable the zoomed-out Silhouettes overlay (Highlight mode), like the vanilla shuttles do.
+         Defaults to false, so without this our craft get no silhouette. (Silhouettes are east/west
+         only in vanilla - never N/S - so this matches the vanilla shuttle's behaviour exactly.) -->
+    <drawHighlight>true</drawHighlight>
     <repairEffect>ConstructMetal</repairEffect>
     <preventSkyfallersLandingOn>true</preventSkyfallersLandingOn>
     <forceDebugSpawnable>true</forceDebugSpawnable>
@@ -125,7 +129,7 @@
   <ThingDef ParentName="OSV_ShuttleBase">
     <defName>OSV_CargoShuttle</defName>
     <label>cargo shuttle</label>
-    <description>A heavy-lift transport shuttle built around an oversized cargo hold. It carries far more mass than a standard shuttle at the cost of slower turnaround and thirstier engines.</description>
+    <description>A chemfuel-powered freight shuttle, built around an oversized cargo hold. It trades passenger seating and quick turnaround for raw carrying capacity.</description>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
     <!-- Footprint hugs the sprite so the selection box sits tight on the hull (like vanilla).
          drawSize 4.3x6.6 only hugs at width 4 (odd 3 overflows, 5 is loose) - so this is even,
@@ -231,7 +235,7 @@
   <ThingDef ParentName="OSV_ShuttleBase">
     <defName>OSV_TroopShuttle</defName>
     <label>troop shuttle</label>
-    <description>A fast personnel shuttle tuned for rapid insertion and extraction. It trades raw cargo capacity for speed and range.</description>
+    <description>A lightweight chemfuel shuttle tuned for rapid insertion and extraction. It carries a full squad with speed and range to spare, but almost no room for cargo.</description>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
     <statBases>
       <WorkToBuild>34000</WorkToBuild>

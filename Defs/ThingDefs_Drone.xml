@@ -7,7 +7,7 @@
   <ThingDef ParentName="OSV_ShuttleBase">
     <defName>OSV_DroneShuttle</defName>
     <label>transport drone</label>
-    <description>A small autonomous cargo drone for long-range, hands-off deliveries. (Full autonomous behaviour arrives in a later update; for now it flies like a standard shuttle.)</description>
+    <description>A small chemfuel drone that flies itself, with no pilot or crew aboard. It runs cargo on long hauls and can be left to land and hold its load in the field until recalled.</description>
     <constructionSkillPrerequisite>5</constructionSkillPrerequisite>
     <statBases>
       <WorkToBuild>26000</WorkToBuild>

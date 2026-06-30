@@ -10,7 +10,7 @@
   <ThingDef ParentName="OSV_ShuttleBase">
     <defName>OSV_HeavyCargoShip</defName>
     <label>heavy cargo ship</label>
-    <description>A massive four-engine cargo lifter built for moving freight by the tonne. Its cavernous hold dwarfs a standard cargo shuttle, but it is slow to cycle, drinks fuel, and cannot range as far.</description>
+    <description>A massive chemfuel hauler built on a reinforced load-bearing deck. It moves more freight than any other shuttle, at the cost of speed, range, and a heavy thirst for fuel.</description>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
     <!-- North-default orientation (nose up) is portrait, so the footprint is 6 wide x 10 deep;
          rotating to east gives the 10x6 wide pad. Now fully rotatable like the rest of the fleet. -->
