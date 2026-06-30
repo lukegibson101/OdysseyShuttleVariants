@@ -28,5 +28,9 @@ Portions of the materials used to create this content/mod are trademarks and/or 
     <li>Ludeon.RimWorld.Royalty</li>
     <li>Ludeon.RimWorld.Biotech</li>
     <li>Ludeon.RimWorld.Odyssey</li>
+    <!-- Optional: when present, load after Multiplayer so its API is initialized before our
+         StaticConstructorOnStartup registers sync methods. Not a dependency - the mod runs fine
+         without Multiplayer (the API stub reports MP.enabled = false). -->
+    <li>rwmt.Multiplayer</li>
   </loadAfter>
 </ModMetaData>

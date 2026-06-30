@@ -27,7 +27,8 @@
       <Plasteel>220</Plasteel>
       <ComponentIndustrial>10</ComponentIndustrial>
       <SubcoreBasic>4</SubcoreBasic>
-      <ShuttleEngine>2</ShuttleEngine>
+      <SubcoreRegular>2</SubcoreRegular>
+      <ShuttleEngine>1</ShuttleEngine>
     </costList>
     <researchPrerequisites>
       <li>OSV_MechShuttleTech</li>
@@ -52,7 +53,7 @@
         <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
       </li>
       <li Class="CompProperties_Transporter">
-        <massCapacity>2000</massCapacity>
+        <massCapacity>500</massCapacity>
         <max1PerGroup>true</max1PerGroup>
         <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
         <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
@@ -60,9 +61,9 @@
         <showMassInInspectString>true</showMassInInspectString>
       </li>
       <li Class="CompProperties_Refuelable">
-        <fuelCapacity>600</fuelCapacity>
+        <fuelCapacity>650</fuelCapacity>
         <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
-        <initialConfigurableTargetFuelLevel>600</initialConfigurableTargetFuelLevel>
+        <initialConfigurableTargetFuelLevel>650</initialConfigurableTargetFuelLevel>
         <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
         <fuelLabel>Chemfuel</fuelLabel>
         <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>

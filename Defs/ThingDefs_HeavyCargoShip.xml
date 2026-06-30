@@ -59,7 +59,7 @@
         <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
       </li>
       <li Class="CompProperties_Transporter">
-        <massCapacity>4500</massCapacity>
+        <massCapacity>2500</massCapacity>
         <max1PerGroup>true</max1PerGroup>
         <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
         <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
@@ -67,9 +67,9 @@
         <showMassInInspectString>true</showMassInInspectString>
       </li>
       <li Class="CompProperties_Refuelable">
-        <fuelCapacity>900</fuelCapacity>
+        <fuelCapacity>800</fuelCapacity>
         <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
-        <initialConfigurableTargetFuelLevel>900</initialConfigurableTargetFuelLevel>
+        <initialConfigurableTargetFuelLevel>800</initialConfigurableTargetFuelLevel>
         <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
         <fuelLabel>Chemfuel</fuelLabel>
         <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>

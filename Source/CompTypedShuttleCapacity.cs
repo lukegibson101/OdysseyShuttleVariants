@@ -59,6 +59,17 @@ namespace OdysseyShuttleVariants
                         shuttle.maxColonistCount = Props.maxColonists;
                     }
                 }
+
+                // Make the launch cooldown count from LANDING, not launch. Vanilla stamps
+                // CompLaunchable.lastLaunchTick at launch, so a long flight burns the cooldown mid-air
+                // (the "ready to launch again" message can fire before the shuttle even lands). A
+                // shuttle spawning fresh (not a save reload) with lastLaunchTick > 0 is landing from a
+                // flight - not freshly constructed (that's -1) - so restart the cooldown from now.
+                CompLaunchable launchable = parent.TryGetComp<CompLaunchable>();
+                if (launchable != null && launchable.lastLaunchTick > 0)
+                {
+                    launchable.lastLaunchTick = Find.TickManager.TicksGame;
+                }
             }
 
             EnsureLaunchReady();

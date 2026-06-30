@@ -25,6 +25,7 @@
       <Steel>150</Steel>
       <Plasteel>90</Plasteel>
       <ComponentIndustrial>6</ComponentIndustrial>
+      <SubcoreHigh>1</SubcoreHigh>
       <ShuttleEngine>1</ShuttleEngine>
     </costList>
     <researchPrerequisites>
@@ -47,7 +48,7 @@
         <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
       </li>
       <li Class="CompProperties_Transporter">
-        <massCapacity>500</massCapacity>
+        <massCapacity>1000</massCapacity>
         <max1PerGroup>true</max1PerGroup>
         <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
         <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
@@ -55,9 +56,9 @@
         <showMassInInspectString>true</showMassInInspectString>
       </li>
       <li Class="CompProperties_Refuelable">
-        <fuelCapacity>500</fuelCapacity>
+        <fuelCapacity>650</fuelCapacity>
         <targetFuelLevelConfigurable>true</targetFuelLevelConfigurable>
-        <initialConfigurableTargetFuelLevel>500</initialConfigurableTargetFuelLevel>
+        <initialConfigurableTargetFuelLevel>650</initialConfigurableTargetFuelLevel>
         <fuelFilter><thingDefs><li>Chemfuel</li></thingDefs></fuelFilter>
         <fuelLabel>Chemfuel</fuelLabel>
         <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
@@ -105,16 +106,17 @@
     <defName>OSV_DroneShuttleTech</defName>
     <label>transport drone</label>
     <description>Autonomous flight control and lightweight drone frames, enabling construction of the transport drone.</description>
-    <baseCost>2500</baseCost>
+    <baseCost>4000</baseCost>
     <techLevel>Spacer</techLevel>
     <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
     <requiredResearchFacilities>
       <li>MultiAnalyzer</li>
     </requiredResearchFacilities>
     <prerequisites>
-      <!-- Drone hangs off the Mech shuttle (autonomous flight builds on mech control tech).
-           Mech is Biotech-only, so this makes the Drone require Biotech too - intended. -->
+      <!-- Drone autonomy builds on advanced mech control: requires the Mechanitor Shuttle research AND
+           vanilla High Mechtech. Both are Biotech-only, so the Drone requires Biotech too - intended. -->
       <li>OSV_MechShuttleTech</li>
+      <li>HighMechtech</li>
     </prerequisites>
     <tab>OSV_ShuttlesTab</tab>
     <researchViewX>3.0</researchViewX>

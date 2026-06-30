@@ -169,6 +169,8 @@ namespace OdysseyShuttleVariants
         private void FormCamp()
         {
             PlanetTile tile = Tile;
+            // Capture now (the long event runs later, outside the synced-command context).
+            bool showUi = MultiplayerCompat.ShowUiForThisClient;
             LongEventHandler.QueueLongEvent(delegate
             {
                 IntVec3 size = OSV_WorldObjectDefOf.OSV_DroneCamp.overrideMapSize ?? Find.World.info.initialMapSize;
@@ -188,8 +190,11 @@ namespace OdysseyShuttleVariants
 
                 if (!Destroyed) Destroy();
 
-                if (landed != null) CameraJumper.TryJump(landed);
-                else CameraJumper.TryJump(map.Center, map);
+                if (showUi)
+                {
+                    if (landed != null) CameraJumper.TryJump(landed);
+                    else CameraJumper.TryJump(map.Center, map);
+                }
             }, "GeneratingMap", doAsynchronously: true, GameAndMapInitExceptionHandlers.ErrorWhileGeneratingMap);
         }
 
@@ -281,10 +286,13 @@ namespace OdysseyShuttleVariants
             CompLaunchable launchable = shuttle.LaunchableComp;
             float fuelLevel = shuttle.FuelLevel;
 
+            // In MP this runs on every client; only surface reject messages to the issuing player.
+            bool showUi = MultiplayerCompat.ShowUiForThisClient;
+
             AcceptanceReport canLaunch = launchable.CanLaunch(fuelLevel);
             if (!canLaunch.Accepted)
             {
-                Messages.Message(canLaunch.Reason.NullOrEmpty() ? "The transport drone can't launch right now."
+                if (showUi) Messages.Message(canLaunch.Reason.NullOrEmpty() ? "The transport drone can't launch right now."
                     : canLaunch.Reason, this, MessageTypeDefOf.RejectInput, historical: false);
                 return;
             }
@@ -294,7 +302,7 @@ namespace OdysseyShuttleVariants
             {
                 // Strand: not enough fuel/range. The recovery path is Form camp - it needs no fuel, lands
                 // the ship as a normal building you can refuel with chemfuel, then re-launch.
-                Messages.Message("The transport drone doesn't have enough fuel to reach there. Form a camp to "
+                if (showUi) Messages.Message("The transport drone doesn't have enough fuel to reach there. Form a camp to "
                     + "land it as a refuelable ship.", this, MessageTypeDefOf.RejectInput, historical: false);
                 return;
             }
@@ -324,7 +332,8 @@ namespace OdysseyShuttleVariants
             Destroy();
 
             // Stay on the world map, following the departing drone (same as a caravan-launched shuttle).
-            CameraJumper.TryJump(travelling);
+            // Only the issuing client's camera moves in MP.
+            if (showUi) CameraJumper.TryJump(travelling);
         }
     }
 }

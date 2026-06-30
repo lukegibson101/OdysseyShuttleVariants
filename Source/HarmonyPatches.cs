@@ -476,4 +476,92 @@ namespace OdysseyShuttleVariants
             Find.WindowStack.Add(new FloatMenu(list));
         }
     }
+
+    // ===== Cargo mass split =====
+    // Make the cargo/mass pool exclude humanlike (crew) and mechanoid (mech) pawn mass for our shuttles,
+    // so crew and mechs - which are governed by the count cap and the bandwidth budget - don't eat into
+    // cargo. Cargo mass = items + animals + other non-humanlike-non-mech pawns. The shuttle is identified
+    // by carrying CompTypedShuttleCapacity (so this never touches drop pods or other transporters). No
+    // faction guard needed: quests use the Core Shuttle and the PassengerShuttle is player-built, so the
+    // comp only ever rides on player-owned shuttles.
+
+    internal static class MassSplit
+    {
+        // Mass of pawns that don't count as cargo (humanlike crew + mechs), summed the same way the
+        // game adds them (GetStatValue(Mass) * stackCount), to subtract cleanly from the mass total.
+        public static float ExcludedMass(ThingOwner container)
+        {
+            float m = 0f;
+            for (int i = 0; i < container.Count; i++)
+            {
+                if (container[i] is Pawn p && (p.RaceProps.Humanlike || p.RaceProps.IsMechanoid))
+                {
+                    m += p.GetStatValue(StatDefOf.Mass) * p.stackCount;
+                }
+            }
+            return m;
+        }
+    }
+
+    // The canonical mass source: covers the inspect line, CompLaunchable.CanLaunch's over-mass check,
+    // and re-launch validation. Cached value is left untouched; we only adjust the returned result.
+    [HarmonyPatch(typeof(CompTransporter), "MassUsage", MethodType.Getter)]
+    public static class Patch_CompTransporter_MassUsage
+    {
+        public static void Postfix(CompTransporter __instance, ref float __result)
+        {
+            if (__instance.parent.TryGetComp<CompTypedShuttleCapacity>() == null) return;
+            float excl = MassSplit.ExcludedMass(__instance.innerContainer);
+            if (excl > 0f) __result = Mathf.Max(__result - excl, 0f);
+        }
+    }
+
+    // The load dialog's own mass calc (drives the mass bar + the over-mass block on Accept). Vanilla
+    // already includes pawn mass here for our shuttles (requiredColonistCount == 0), so subtract the
+    // crew+mech mass of the currently-selected transferables.
+    [HarmonyPatch(typeof(Dialog_LoadTransporters), "MassUsage", MethodType.Getter)]
+    public static class Patch_Dialog_MassUsage
+    {
+        public static void Postfix(Dialog_LoadTransporters __instance, ref float __result)
+        {
+            if (DialogAccess.GetComp(__instance) == null) return;
+            float excl = 0f;
+            List<TransferableOneWay> list = DialogAccess.Transferables(__instance);
+            if (list != null)
+            {
+                foreach (TransferableOneWay tr in list)
+                {
+                    if (tr.CountToTransfer > 0 && tr.AnyThing is Pawn p
+                        && (p.RaceProps.Humanlike || p.RaceProps.IsMechanoid))
+                    {
+                        excl += p.GetStatValue(StatDefOf.Mass) * tr.CountToTransfer;
+                    }
+                }
+            }
+            if (excl > 0f) __result = Mathf.Max(__result - excl, 0f);
+        }
+    }
+
+    // When one of our shuttles is carried in a caravan (it landed on an empty tile with colonists, who
+    // became caravan members), re-launch goes through CaravanShuttleUtility, whose mass check sums the
+    // caravan pawns. Without this, a crewed Troop shuttle (100 kg cargo) couldn't re-launch because its
+    // 12 colonists' mass dwarfs the cap. Exclude crew + mech mass here too.
+    [HarmonyPatch(typeof(CaravanShuttleUtility), "GetCaravanShuttleMass")]
+    public static class Patch_CaravanShuttleMass
+    {
+        public static void Postfix(Caravan caravan, ref float __result)
+        {
+            Building_PassengerShuttle shuttle = caravan.Shuttle;
+            if (shuttle == null || shuttle.TryGetComp<CompTypedShuttleCapacity>() == null) return;
+            float excl = 0f;
+            foreach (Pawn p in caravan.PawnsListForReading)
+            {
+                if (p.RaceProps.Humanlike || p.RaceProps.IsMechanoid)
+                {
+                    excl += p.GetStatValue(StatDefOf.Mass);
+                }
+            }
+            if (excl > 0f) __result = Mathf.Max(__result - excl, 0f);
+        }
+    }
 }

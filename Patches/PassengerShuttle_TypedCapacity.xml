@@ -13,8 +13,18 @@
     <order>Append</order>
     <value>
       <li Class="OdysseyShuttleVariants.CompProperties_TypedShuttleCapacity">
-        <maxColonists>6</maxColonists>
+        <maxColonists>4</maxColonists>
       </li>
+    </value>
+  </Operation>
+
+  <!-- Cargo profile: with the crew/cargo split, this 250 is pure cargo (crew is free, count-capped
+       at 4 above). Player-built only (quests use the Core Shuttle), and the split/cap behaviour is
+       player-faction-guarded in C#, so non-player PassengerShuttles are unaffected by the comp. -->
+  <Operation Class="PatchOperationReplace">
+    <xpath>/Defs/ThingDef[defName="PassengerShuttle"]/comps/li[@Class="CompProperties_Transporter"]/massCapacity</xpath>
+    <value>
+      <massCapacity>250</massCapacity>
     </value>
   </Operation>
 
