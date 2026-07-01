@@ -30,9 +30,55 @@ namespace OdysseyShuttleVariants
         }
     }
 
+    // DefOf for the mech-bay expansion research (Biotech-only). Each finished tier raises the
+    // mechanitor shuttle's carried-mech bandwidth budget - see CompTypedShuttleCapacity.EffectiveMechBandwidth.
+    [DefOf]
+    public static class OSV_ResearchDefOf
+    {
+        [MayRequireBiotech] public static ResearchProjectDef OSV_MechBayExpansion1;
+        [MayRequireBiotech] public static ResearchProjectDef OSV_MechBayExpansion2;
+
+        static OSV_ResearchDefOf()
+        {
+            DefOfHelper.EnsureInitializedInCtor(typeof(OSV_ResearchDefOf));
+        }
+    }
+
     public class CompTypedShuttleCapacity : ThingComp
     {
         public CompProperties_TypedShuttleCapacity Props => (CompProperties_TypedShuttleCapacity)props;
+
+        // Mech bandwidth budget as actually enforced: the def's base plus any completed mech-bay
+        // expansion research (+3 per tier). Research is per-save/global, so every mech shuttle shares
+        // the same upgraded budget. Returns the base (0) unchanged for non-mech craft. All cap reads
+        // (inspect line, info card, load-dialog readout + accept check, enter-job budget) use this.
+        public int EffectiveMechBandwidth
+        {
+            get
+            {
+                int cap = Props.mechBandwidthCapacity;
+                return cap > 0 ? cap + MechBandwidthBonus() : cap;
+            }
+        }
+
+        // +6 bandwidth per finished mech-bay expansion tier.
+        public static int MechBandwidthBonus() => MechBayExpansionTiers() * 6;
+
+        // Number of finished mech-bay expansion tiers (0-2). Also drives how many mechs can charge at a
+        // landed mech shuttle at once (see CompMechChargerShuttle.EffectiveMaxSimultaneous).
+        // Guarded against a null game context: ResearchProjectDef.IsFinished reads Find.ResearchManager,
+        // which is null when this comp's stats are shown outside a live game (e.g. the architect/def
+        // info card) - without this guard that NREs the whole info-card stats list.
+        public static int MechBayExpansionTiers()
+        {
+            if (Current.Game == null) return 0;
+            int tiers = 0;
+            ResearchProjectDef r1 = OSV_ResearchDefOf.OSV_MechBayExpansion1;
+            ResearchProjectDef r2 = OSV_ResearchDefOf.OSV_MechBayExpansion2;
+            if (r1 != null && r1.IsFinished) tiers++;
+            if (r2 != null && r2.IsFinished) tiers++;
+            return tiers;
+        }
 
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
@@ -143,7 +189,7 @@ namespace OdysseyShuttleVariants
 
             if (Props.mechBandwidthCapacity > 0)
             {
-                lines.Add("Mechs: " + LoadedMechBandwidth() + " / " + Props.mechBandwidthCapacity + " bandwidth");
+                lines.Add("Mechs: " + LoadedMechBandwidth() + " / " + EffectiveMechBandwidth + " bandwidth");
             }
 
             return lines.Count > 0 ? string.Join("\n", lines.ToArray()) : null;
@@ -178,10 +224,14 @@ namespace OdysseyShuttleVariants
 
             if (Props.mechBandwidthCapacity > 0)
             {
+                string val = EffectiveMechBandwidth + " bandwidth";
+                int bonus = MechBandwidthBonus();
+                if (bonus > 0) val += " (base " + Props.mechBandwidthCapacity + " + " + bonus + " researched)";
                 yield return new StatDrawEntry(StatCategoryDefOf.Building, "Mech bay capacity",
-                    Props.mechBandwidthCapacity + " bandwidth",
+                    val,
                     "Mechs are carried against a bandwidth budget - each mech's bandwidth cost "
-                    + "(e.g. cleansweeper 1, tunneler 3). The total carried must not exceed this.", 4904);
+                    + "(e.g. cleansweeper 1, tunneler 3). The total carried must not exceed this. "
+                    + "Mech-bay expansion research raises this budget.", 4904);
             }
         }
     }

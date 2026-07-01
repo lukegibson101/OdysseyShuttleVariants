@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Biotech-only mech-bay expansion line for the mechanitor shuttle. Each finished tier raises the
+       shuttle's carried-mech bandwidth budget (+6 each: base 6 -> 12 -> 18) AND adds one field-charging
+       slot (base 2 -> 3 -> 4). This boosts the EXISTING craft's signature stats rather than adding new
+       variants; enforcement reads the level live via CompTypedShuttleCapacity.EffectiveMechBandwidth /
+       CompMechChargerShuttle.EffectiveMaxSimultaneous. Both need the base mechanitor shuttle research. -->
+
+  <ResearchProjectDef>
+    <defName>OSV_MechBayExpansion1</defName>
+    <label>mech bay expansion I</label>
+    <description>Denser control racks and signal relays let the mechanitor shuttle direct a larger warband - raising its carried-mech bandwidth budget from 6 to 12, and letting one more mech charge at the landed hull at once.</description>
+    <baseCost>3500</baseCost>
+    <techLevel>Spacer</techLevel>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <requiredResearchFacilities>
+      <li>MultiAnalyzer</li>
+    </requiredResearchFacilities>
+    <prerequisites>
+      <li>OSV_MechShuttleTech</li>
+    </prerequisites>
+    <tab>OSV_ShuttlesTab</tab>
+    <researchViewX>1.0</researchViewX>
+    <researchViewY>3.6</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>OSV_MechBayExpansion2</defName>
+    <label>mech bay expansion II</label>
+    <description>A second control tier and reinforced mech bays push the mechanitor shuttle's carried-mech bandwidth budget from 12 to 18, and add a further field-charging slot.</description>
+    <baseCost>5500</baseCost>
+    <techLevel>Spacer</techLevel>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <requiredResearchFacilities>
+      <li>MultiAnalyzer</li>
+    </requiredResearchFacilities>
+    <prerequisites>
+      <li>OSV_MechBayExpansion1</li>
+    </prerequisites>
+    <tab>OSV_ShuttlesTab</tab>
+    <researchViewX>2.0</researchViewX>
+    <researchViewY>3.6</researchViewY>
+  </ResearchProjectDef>
+
+</Defs>

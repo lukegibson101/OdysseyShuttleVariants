@@ -8,7 +8,7 @@
   <ThingDef ParentName="OSV_ShuttleBase">
     <defName>OSV_MechShuttle</defName>
     <label>mechanitor shuttle</label>
-    <description>A chemfuel shuttle given over to mech control gear and signal relays. Flown by a mechanitor, it ferries a warband of mechs between sites and carries little else.</description>
+    <description>A chemfuel shuttle given over to mech control gear and signal relays. Flown by a mechanitor, it ferries a warband of mechs between sites and carries little else. Landed, it can recharge nearby colony mechs off its own chemfuel - a field charger with no need for a power grid.</description>
     <constructionSkillPrerequisite>7</constructionSkillPrerequisite>
     <statBases>
       <WorkToBuild>44000</WorkToBuild>
@@ -43,6 +43,13 @@
         <mechBandwidthCapacity>6</mechBandwidthCapacity>
         <requireMechanitor>true</requireMechanitor>
       </li>
+      <!-- Landed, this shuttle can recharge nearby colony mechs off its own chemfuel (off by
+           default - see CompMechChargerShuttle). The hull is the charger; no separate buildings. -->
+      <li Class="OdysseyShuttleVariants.CompProperties_MechChargerShuttle">
+        <chargeRatePerDay>50</chargeRatePerDay>
+        <fuelPerEnergy>0.25</fuelPerEnergy>
+        <maxSimultaneousCharging>2</maxSimultaneousCharging>
+      </li>
       <li Class="CompProperties_Launchable">
         <fuelPerTile>3.3</fuelPerTile>
         <minFuelCost>55</minFuelCost>
@@ -53,7 +60,7 @@
         <cooldownEndedMessage>{0} is ready to launch again.</cooldownEndedMessage>
       </li>
       <li Class="CompProperties_Transporter">
-        <massCapacity>500</massCapacity>
+        <massCapacity>50</massCapacity>
         <max1PerGroup>true</max1PerGroup>
         <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
         <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>

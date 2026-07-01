@@ -54,27 +54,34 @@ conflict, this file wins.
 
 ## Roadmap / backlog
 Done: ✅ 5 craft + passenger integration · ✅ typed capacity + cargo mass-split · ✅ autonomous drone
-(land/hold/recall/camp/gift) · ✅ MP sync · ✅ fuel/cooldown balance · ✅ research tree · ✅ directional art.
+(land/hold/recall/camp/gift) · ✅ MP sync · ✅ fuel/cooldown balance · ✅ research tree · ✅ directional art ·
+✅ drone Biotech-gating (`Biotech/Defs/ThingDefs_Drone.xml`) · ✅ mech-shuttle field charging ·
+✅ mech-bay bandwidth upgrade research.
 
 Remaining:
-1. **Drone Biotech-gating** (release prep) — `Defs/ThingDefs_Drone.xml` references Biotech-only research
-   (`HighMechtech`, `OSV_MechShuttleTech`) but loads from root → red errors without Biotech. Move the drone
-   defs into `Biotech/` (like the Mech shuttle) to gate cleanly.
-2. **MP test** of the drone/camp/gift actions (troop/cargo launches verified clean).
-3. **Per-shuttle upgrade research trees** — projects that boost a craft's signature stat (cargo / fuel
-   efficiency / range / crew-or-mech cap, e.g. mech bandwidth 6→9→12). Stats already read off the comp.
-   DECISION (Luke 2026-07-01): upgrades **boost the EXISTING craft's stat** (comp reads research level),
-   **NOT** new bigger-footprint variants per tier — avoids a per-tier art/def explosion (art is the
-   bottleneck), benefits already-built ships, keeps the architect menu clean. The distinct craft
-   (Troop/Cargo/Heavy/Mech/Drone) already provide the big size/role tiers; research just fine-tunes each.
-4. **Mech recharging at the Mechanitor shuttle** (chemfuel-powered, landed-only). Design: the parked
-   (spawned) shuttle acts like a mobile `Building_MechCharger` — deployed mechs walk up and charge at
-   spots around the hull, fuelled by the shuttle's chemfuel at ~50% efficiency; adjacency throttles how many
-   charge at once. A default-off **"Mech charging" toggle** controls it (fuel safety — charging burns the
-   same fuel needed to fly home). **The hull is the charger** — do NOT spawn real charger buildings
-   (electrical / lifecycle / stray-building mess); use a comp on the shuttle, optional charge-spot marker
-   overlay. Reuse `Building_MechCharger` / `JobDriver_MechCharge` / `WorkGiver_HaulMechToCharger` /
-   `JobGiver_GetEnergy_Charger` / `Need_MechEnergy`. Moderate C#, MP-deterministic.
+1. **MP test** of the drone/camp/gift actions AND the new mech-charging toggle (troop/cargo launches
+   verified clean; the toggle syncs via `CompMechChargerShuttle.SetChargingEnabled` in `MultiplayerCompat`).
+
+Recently landed (implementation notes):
+- **Mech charging at the Mechanitor shuttle** (`CompMechChargerShuttle` + `JobDriver_MechChargeAtShuttle` +
+  `Patch_JobGiver_GetEnergy_Charger`). The landed hull IS the charger — no real charger buildings. A
+  low colony mech that can't reach a real `Building_MechCharger` falls back to the nearest shuttle whose
+  **"Mech charging" toggle** (default OFF, opt-in — charging drains flight fuel) is on; it walks to a free adjacent cell and tops up
+  at 50/day, paying `fuelPerEnergy` (0.25) chemfuel per point from the shuttle's own tank. `maxSimultaneousCharging`
+  (base 2, +1 per mech-bay research tier → 2/3/4 via `EffectiveMaxSimultaneous`) + free-cell reservations
+  throttle crowding. Reuses vanilla charging visuals: `Mote_MechCharging` + `MechChargerCharging` sustainer on
+  the mech (in the job driver) and a `Other/BundledWires` cable from each mech to the hull centre drawn at
+  `AltitudeLayer.SmallWire` (below Building) so the ship renders on top. Discovery reuses vanilla's recharge slot via a
+  Harmony **postfix** on `JobGiver_GetEnergy_Charger.TryGiveJob` (no think-tree XML edit; strict fallback).
+  Charger lookup iterates a static spawned-charger registry with a deterministic (dist, thingIDNumber)
+  tiebreak → MP-safe. Note: can't reuse vanilla `JobDriver_MechCharge`/`Need_MechEnergy.currentCharger`
+  directly — both hard-type to `Building_MechCharger`.
+- **Per-shuttle upgrade research — DESCOPED to the mech ship only** (Luke 2026-07-01): two Biotech projects
+  `OSV_MechBayExpansion1/2` raise the mechanitor shuttle's bandwidth budget 6→12→18 (+6/tier) and each add a
+  field-charging slot (2→3→4). No other craft,
+  no new variants (avoids the per-tier art/def explosion — art is the bottleneck). `CompTypedShuttleCapacity.
+  EffectiveMechBandwidth` = base + finished-research bonus; ALL cap reads (inspect line, info card, load-dialog
+  readout + accept, enter-job budget) route through it, so already-built ships benefit live.
 
 ## Related (separate future mods)
 - **Crew Presets** — named groups of pawns (colonists/animals/mechs) applied across the vanilla pawn-selection

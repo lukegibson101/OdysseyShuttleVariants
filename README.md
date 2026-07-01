@@ -17,7 +17,7 @@ Shuttle** is folded into the same capacity system as the baseline all-rounder.
 | Troop | 12 | – | 100 | 550 | 120 | fast squad insertion/extraction |
 | Cargo | 2 | – | 1250 | 600 | 85 | dedicated hauler |
 | Heavy Cargo | 4 | – | 2500 | 800 | 70 | flagship hauler — slow, thirsty, short range |
-| Mechanitor *(Biotech)* | 1 mechanitor | 6 bandwidth | 500 | 650 | 90 | mech strike carrier |
+| Mechanitor *(Biotech)* | 1 mechanitor | 6 bandwidth | 50 | 650 | 90 | mech strike carrier |
 | Transport Drone *(Biotech)* | 0 | – | 1000 | 650 | 200 | autonomous courier |
 
 *Crew = seat count; Mechs = a bandwidth budget (sum of each mech's BandwidthCost); Cargo = item/animal mass
@@ -47,13 +47,20 @@ research tab.
 Original ¾ directional art per craft (`Textures/Things/Building/OSV/<Craft>/`, the Biotech one under
 `Biotech/Textures/...`), rotatable + paintable (`Graphic_Multi` + `CutoutComplex` + `_m` paint masks).
 
+## Mech support (Biotech)
+
+- **Field charging** — a landed Mechanitor shuttle doubles as a **chemfuel-powered mech charger** with no
+  power grid. Flip on its **"Mech charging"** toggle (off by default — it drains the fuel the shuttle needs to
+  fly home) and low colony mechs that can't reach a real charger walk up to the hull and top up from its tank.
+  A real `Building_MechCharger` always wins; the shuttle is the field fallback.
+- **Mech-bay expansion research** — two Biotech projects raise the Mechanitor shuttle's carried-mech
+  **bandwidth budget 6 → 12 → 18** and widen its **field-charging line 2 → 3 → 4** mechs at once. It boosts the
+  *existing* craft (no new variants), so ships you already built benefit the moment the research finishes.
+
 ## Roadmap
 
-Feature-complete and stable for singleplayer. Planned next:
-- **Drone Biotech-gating** — move the drone defs under `Biotech/` so non-Biotech games don't error (release prep).
-- **Per-shuttle upgrade research** — projects that boost a craft's signature stat (cargo / fuel efficiency /
-  range / crew-or-mech capacity).
-- **Mech recharging** — a landed Mechanitor shuttle acts as a chemfuel-powered field charger for nearby mechs.
+Feature-complete and stable for singleplayer. Remaining before release: a **multiplayer test** of the
+autonomous-drone world commands and the mech-charging toggle (troop/cargo launches are already MP-verified).
 
 See `CLAUDE.md` for the dev guide and the full backlog.
 

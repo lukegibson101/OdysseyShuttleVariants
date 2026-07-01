@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Biotech-only: a colony mech recharging at a landed mechanitor shuttle (our chemfuel field
+       charger). Issued as a fallback by Patch_JobGiver_GetEnergy_Charger when no real
+       Building_MechCharger is reachable; run by JobDriver_MechChargeAtShuttle. -->
+  <JobDef>
+    <defName>OSV_MechChargeAtShuttle</defName>
+    <driverClass>OdysseyShuttleVariants.JobDriver_MechChargeAtShuttle</driverClass>
+    <reportString>charging at shuttle.</reportString>
+  </JobDef>
+
+</Defs>

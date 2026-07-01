@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <!-- Autonomous cargo drone. STUB: a small, fast, long-range, low-cargo buildable shuttle so it's
-       in the lineup + testable now. The autonomous behaviour (0-crew launch, gift-at-settlement,
-       strand-if-low-fuel) is the later C# phase; for now it flies like a normal player shuttle. -->
+  <!-- Biotech-only. Inherits the OSV_ShuttleBase / skyfaller bases defined in the root Defs
+       (root always loads; this folder only loads when Biotech is active - see LoadFolders.xml).
+       Its research requires Biotech-only projects (OSV_MechShuttleTech + HighMechtech), so this file
+       must live here or it throws red errors in non-Biotech games.
+
+       Autonomous cargo drone: 0-crew launch, land-and-hold cargo in the field, recall / send-onward /
+       form-camp / gift-at-settlement, strand-if-low-fuel with camp-refuel recovery. Behaviour is in
+       Source/ (WorldObject_LandedDrone + TransportersArrivalAction_DroneLand/_DroneGift). -->
   <ThingDef ParentName="OSV_ShuttleBase">
     <defName>OSV_DroneShuttle</defName>
     <label>transport drone</label>

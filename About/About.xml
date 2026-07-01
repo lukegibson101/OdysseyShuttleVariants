@@ -6,7 +6,11 @@
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Expands the Odyssey transport-shuttle system with distinct buildable variants (cargo / troop / mechanitor), a tiered engine research tree, and (planned) independent crew and cargo capacity.
+  <description>Expands the Odyssey transport-shuttle system with a family of buildable, role-distinct craft - Troop, Cargo, Heavy Cargo, Mechanitor (Biotech) and an autonomous Transport Drone (Biotech) - plus the vanilla Passenger Shuttle folded into the same system.
+
+Each craft carries colonists, mechs and cargo as INDEPENDENT capacity pools (typed capacity), instead of vanilla's single shared mass limit, with clear load-dialog readouts. The Transport Drone flies with no crew: send it anywhere, land and hold its cargo in the field, then recall it, send it onward, form a camp, or gift its cargo to a friendly settlement.
+
+Research-gated off the vanilla Shuttles project and built in the Odyssey architect category; each craft costs a rare ShuttleEngine (trader/reward only).
 
 Multiplayer-compatible.
 

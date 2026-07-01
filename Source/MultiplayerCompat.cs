@@ -23,6 +23,11 @@ namespace OdysseyShuttleVariants
             // (DroneGift scribes its settlement; DroneLand has no state).
             MP.RegisterSyncMethod(typeof(WorldObject_LandedDrone), "LaunchTo").ExposeParameter(1);
             MP.RegisterSyncMethod(typeof(WorldObject_LandedDrone), "FormCamp");
+
+            // The mech-shuttle "Mech charging" toggle mutates shared state, so sync the setter; the
+            // Command_Toggle's toggleAction calls it so every client flips together. (Charging itself
+            // runs in the MP-synced job tick, so no extra sync is needed there.)
+            MP.RegisterSyncMethod(typeof(CompMechChargerShuttle), "SetChargingEnabled");
         }
 
         // True when UI side effects (camera jumps, reject messages) should run on this client: always

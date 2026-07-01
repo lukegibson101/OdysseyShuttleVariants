@@ -5,6 +5,7 @@ using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
 namespace OdysseyShuttleVariants
 {
@@ -111,9 +112,9 @@ namespace OdysseyShuttleVariants
 
             if (comp.Props.mechBandwidthCapacity > 0)
             {
+                int cap = comp.EffectiveMechBandwidth;
                 int used = Mathf.RoundToInt(DialogAccess.SelectedMechBandwidth(__instance));
-                DrawLine(ref y, used > comp.Props.mechBandwidthCapacity,
-                    "Mechs: " + used + " / " + comp.Props.mechBandwidthCapacity + " bandwidth");
+                DrawLine(ref y, used > cap, "Mechs: " + used + " / " + cap + " bandwidth");
             }
 
             GUI.color = oldColor;
@@ -180,14 +181,15 @@ namespace OdysseyShuttleVariants
 
             if (comp.Props.mechBandwidthCapacity > 0 && pawns != null)
             {
+                int cap = comp.EffectiveMechBandwidth;
                 float used = 0f;
                 foreach (Pawn p in pawns)
                 {
                     if (p.RaceProps.IsMechanoid) used += p.GetStatValue(StatDefOf.BandwidthCost);
                 }
-                if (used > comp.Props.mechBandwidthCapacity)
+                if (used > cap)
                 {
-                    Messages.Message("This shuttle's mech bay holds at most " + comp.Props.mechBandwidthCapacity
+                    Messages.Message("This shuttle's mech bay holds at most " + cap
                         + " bandwidth of mechs.", MessageTypeDefOf.RejectInput, historical: false);
                     __result = false;
                 }
@@ -273,9 +275,10 @@ namespace OdysseyShuttleVariants
                 __instance.AddFailCondition(delegate
                 {
                     if (pawn == null || !pawn.RaceProps.IsMechanoid) return false;
+                    int cap = comp.EffectiveMechBandwidth;
                     float cost = pawn.GetStatValue(StatDefOf.BandwidthCost);
-                    if (MechBandwidthAboard(parent, pawn) + cost <= comp.Props.mechBandwidthCapacity) return false;
-                    Alert(parent, parent.LabelShortCap + " mech bay is full (" + comp.Props.mechBandwidthCapacity + " bandwidth).");
+                    if (MechBandwidthAboard(parent, pawn) + cost <= cap) return false;
+                    Alert(parent, parent.LabelShortCap + " mech bay is full (" + cap + " bandwidth).");
                     return true;
                 });
             }
@@ -562,6 +565,78 @@ namespace OdysseyShuttleVariants
                 }
             }
             if (excl > 0f) __result = Mathf.Max(__result - excl, 0f);
+        }
+    }
+
+    // ===== Mech charging at a landed mechanitor shuttle =====
+    // Reuse vanilla's recharge think-tree slot instead of editing the Mechanoid think tree.
+    // JobGiver_GetEnergy_Charger.TryGiveJob is the node a low colony mech runs to find a
+    // Building_MechCharger; when it finds none (result == null) but the mech still needs a charge,
+    // we offer the nearest landed mechanitor shuttle (CompMechChargerShuttle) as a fallback. A real
+    // charger therefore always wins; the hull is only used in the field. The actual top-up + fuel
+    // burn happens in JobDriver_MechChargeAtShuttle. Harmless without Biotech (no mechs call this).
+    [HarmonyPatch(typeof(JobGiver_GetEnergy_Charger), "TryGiveJob")]
+    public static class Patch_JobGiver_GetEnergy_Charger
+    {
+        public static void Postfix(JobGiver_GetEnergy_Charger __instance, Pawn pawn, ref Job __result)
+        {
+            if (__result != null) return;                       // a real charger was found
+            if (pawn?.needs?.energy == null || !pawn.IsColonyMech) return;
+
+            // Mirror JobGiver_GetEnergy.ShouldAutoRecharge: only step in if the mech actually wants a
+            // charge (forced is the base-class field, set when the player force-orders a recharge).
+            if (!__instance.forced
+                && pawn.needs.energy.CurLevel + 0.1f >= JobGiver_GetEnergy.GetMinAutorechargeThreshold(pawn))
+                return;
+
+            CompMechChargerShuttle charger = FindShuttleCharger(pawn);
+            if (charger == null) return;
+
+            IntVec3 cell = charger.FreeChargeCellFor(pawn);
+            if (!cell.IsValid) return;
+
+            Job job = JobMaker.MakeJob(OSV_JobDefOf.OSV_MechChargeAtShuttle, charger.Parent, cell);
+            job.overrideFacing = Rot4.South;
+            __result = job;
+        }
+
+        // Nearest reachable landed mechanitor shuttle that can charge this mech right now. Iterates the
+        // spawned-charger registry with a deterministic (distance, thingIDNumber) tiebreak so every MP
+        // client picks the same one.
+        private static CompMechChargerShuttle FindShuttleCharger(Pawn mech)
+        {
+            CompMechChargerShuttle best = null;
+            float bestDist = float.MaxValue;
+            int bestId = int.MaxValue;
+            IReadOnlyList<CompMechChargerShuttle> all = CompMechChargerShuttle.AllSpawned;
+            for (int i = 0; i < all.Count; i++)
+            {
+                CompMechChargerShuttle c = all[i];
+                if (c.Parent.Map != mech.Map || !c.CanChargeNow(mech)) continue;
+                if (!mech.CanReach(c.Parent, PathEndMode.Touch, Danger.Deadly)) continue;
+                if (!c.FreeChargeCellFor(mech).IsValid) continue;
+
+                float d = (c.Parent.Position - mech.Position).LengthHorizontalSquared;
+                int id = c.Parent.thingIDNumber;
+                if (d < bestDist || (d == bestDist && id < bestId))
+                {
+                    bestDist = d;
+                    bestId = id;
+                    best = c;
+                }
+            }
+            return best;
+        }
+    }
+
+    [DefOf]
+    public static class OSV_JobDefOf
+    {
+        [MayRequireBiotech] public static JobDef OSV_MechChargeAtShuttle;
+
+        static OSV_JobDefOf()
+        {
+            DefOfHelper.EnsureInitializedInCtor(typeof(OSV_JobDefOf));
         }
     }
 }
